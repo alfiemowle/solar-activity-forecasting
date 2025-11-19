@@ -1,72 +1,29 @@
 # Solar Activity Forecasting
 
-Time-series forecasting of solar activity (sunspot area) using deep learning and classical machine learning models in Python.
+Time-series forecasting of solar activity (sunspot area) from historical observatory records.
 
-This project is based on my MSc dissertation in **Advanced Aerospace Engineering** at the University of Liverpool, where I built disciplined, reproducible PyTorch pipelines for comparing multiple architectures on historical solar data.
+This repository contains a **selection of example models and notebooks** taken from a larger MSc dissertation project in Advanced Aerospace Engineering at the University of Liverpool. The full project explored a wide range of architectures; here I’ve included some representative models for others to inspect and run.
 
----
+## Project goal
 
-## Project overview
+The core objective is to **forecast sunspot area** using historical solar observations, under consistent preprocessing and evaluation settings.
 
-The goal is to forecast sunspot area from historical observatory records under **consistent preprocessing and evaluation settings**.
+More specifically, the project focuses on:
 
-I compare:
+- Turning raw sunspot area measurements into supervised learning datasets (input–target sequences).
+- Comparing different modelling approaches for time-series forecasting.
+- Evaluating and visualising how well different models predict future solar activity.
 
-- **LSTM** sequence model in PyTorch  
-- **Transformer** with positional encoding  
-- **Autoencoder + MLP** approach  
-- **XGBoost** regression as a classical ML baseline  
+These notebooks are intended as **clean, readable examples**, not a complete dump of every experiment run during the MSc project.
 
-All models share the same:
+## Data
 
-- train/validation/test splits  
-- preprocessing (scaling, lag windows / sequence generation)  
-- error metrics (MAE, MSE, RMSE, R²)  
+The notebooks are designed to work with historical solar / sunspot activity records, for example:
 
----
+- **Royal Greenwich Observatory (RGO)** sunspot area data.
+- Daily or aggregated sunspot area time series.
 
-## Methods & tools
+Depending on how the repository is configured, you may find data files (e.g. `Combined_RGO.txt`, `daily_area.txt`) inside a `data/` folder
 
-- **Python / ML stack**
-  - PyTorch (LSTM, Transformer, autoencoder)
-  - scikit-learn (metrics, model wrappers, Grid/RandomizedSearchCV)
-  - XGBoost
-  - NumPy, Pandas, Matplotlib
-
-- **ML engineering practices**
-  - Custom `Dataset` and `DataLoader` for time series
-  - On-the-fly noise augmentation
-  - Leak-free scaling and deterministic splits
-  - Seed control, gradient clipping, learning-rate scheduling, early stopping
-  - Best-model checkpointing and basic throughput/latency benchmarking
-
-- **Signal processing**
-  - Resampling and smoothing (e.g. tapered boxcar)
-  - Lag-window / sequence generation
-  - (Optionally) Kalman filtering for noisy observations
-
----
-
-## Repository structure
-
-_Example layout (may evolve):_
-
-```text
-notebooks/
-  01_lstm_rgo_sum.ipynb         # LSTM model on RGO sunspot data
-  02_transformer_rgo.ipynb      # Transformer with positional encoding
-  03_autoencoder_sunspot.ipynb  # Autoencoder + MLP forecasting
-  04_xgboost_baseline.ipynb     # XGBoost baseline model
-
-data/
-  Combined_RGO.txt              # Example input data (or see instructions below)
-  daily_area.txt
-
-models/
-  best_transformer_model.pth    # Saved PyTorch models (optional)
-
-src/                            # (Optional) shared utilities
-  datasets.py
-  models.py
-  train.py
+In all cases, the data is treated as a **univariate time series**, then transformed into supervised learning examples by building sequences of past values to predict future values.
 
