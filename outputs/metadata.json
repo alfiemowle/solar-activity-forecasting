@@ -1,0 +1,32 @@
+{
+  "date_generated": "2026-03-09T22:22:18.111842Z",
+  "data_start": "1818-01-01",
+  "data_end": "2026-02-28",
+  "last_data_date": "2026-02-28",
+  "model_name": "xgboost_multistep_v2",
+  "horizons_trained": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    10,
+    14,
+    18,
+    21,
+    25,
+    28,
+    30
+  ],
+  "ensemble_size": 7,
+  "forecast_horizon_days": 30,
+  "validation_window_days": 30,
+  "validation_r2": 0.89821,
+  "validation_mae": 7.5167,
+  "validation_rmse": 8.5005,
+  "leakage_check": "direct multi-step -- each horizon model trained independently on data before cutoff, no autoregressive chaining",
+  "uncertainty_method": "calibrated RMSE on trailing CAL_WINDOW training rows, 80pct prediction interval (1.28 sigma)",
+  "note": "Forecast anchored to last available SILSO data date, not system date. SILSO daily data typically lags 3-7 days behind current date."
+}
