@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar Monitor — Solar Activity Forecasting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens ──────────────────────────────────────────────── */
+    :root {
+      --bg:          #04080f;
+      --bg-navy:     #080d14;
+      --surface:     #0d1520;
+      --surface-hi:  #111c2e;
+      --border:      #192438;
+      --border-hi:   #253650;
+      --text-1:      #e2e8f2;
+      --text-2:      #7a90ae;
+      --text-3:      #3d5170;
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,0.10);
+      --amber-glow:  rgba(245,158,11,0.06);
+      --radius:      14px;
+      --radius-sm:   9px;
+    }
+
+    /* ── Base ────────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text-2);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ═══════════════════════════════════════════════════════════
+       NAVIGATION
+    ═══════════════════════════════════════════════════════════ */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+      background: rgba(4,8,15,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(25,36,56,0.7);
+    }
+    .nav-brand {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--amber);
+      letter-spacing: -0.01em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-2);
+      letter-spacing: 0.01em;
+      transition: color 0.18s;
+    }
+    .nav-links a:hover { color: var(--text-1); }
+    .nav-links a.nav-active { color: var(--amber); }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO — starfield via box-shadow
+    ═══════════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 120% 60% at 50% -10%, rgba(245,158,11,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 80% at 20% 50%, rgba(96,165,250,0.03) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 90% at 80% 60%, rgba(245,158,11,0.03) 0%, transparent 60%),
+        linear-gradient(180deg, #04080f 0%, #060b12 60%, #080d14 100%);
+    }
+
+    /* Stars pseudo-element — 200 tiny box-shadow dots */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      /* Generated star field using box-shadow */
+      background:
+        radial-gradient(1px 1px at 8%  12%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 28%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 22% 65%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30%  5%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(1px 1px at 37% 42%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 78%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 52% 18%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 58% 55%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 65%  8%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72% 88%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 33%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 22%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 96% 50%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at  3% 80%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 11% 48%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 19% 90%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(1px 1px at 26% 35%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 33% 72%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 41% 15%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 49% 60%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 56% 95%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 63% 40%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 75%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 77% 18%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(1px 1px at 84% 55%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 89% 82%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 94%  6%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at  6% 25%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(1px 1px at 13% 62%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 24% 10%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 38% 85%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 47% 38%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 72%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 61% 25%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(1px 1px at 68% 60%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 95%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 42%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(1px 1px at 91% 15%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 98% 68%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 17% 44%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 43% 28%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 73% 52%, rgba(255,255,255,0.30) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 87% 38%, rgba(255,255,255,0.55) 0%, transparent 100%);
+    }
+
+    /* Secondary star layer */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(1px 1px at  5% 38%, rgba(255,255,255,0.18) 0%, transparent 100%),
+        radial-gradient(1px 1px at 12% 72%, rgba(255,255,255,0.22) 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 55%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 88%, rgba(255,255,255,0.18) 0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 32%, rgba(255,255,255,0.22) 0%, transparent 100%),
+        radial-gradient(1px 1px at 53% 68%, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 12%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 67% 48%, rgba(255,255,255,0.18) 0%, transparent 100%),
+        radial-gradient(1px 1px at 74% 82%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 81% 25%, rgba(255,255,255,0.22) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 62%, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 95% 35%, rgba(255,255,255,0.18) 0%, transparent 100%),
+        radial-gradient(1px 1px at  9% 92%, rgba(255,255,255,0.20) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 45%, rgba(255,255,255,0.12) 0%, transparent 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+      padding: 80px 24px 40px;
+    }
+
+    .hero-overline {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--amber);
+      margin-bottom: 24px;
+      opacity: 0.85;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.06;
+      color: var(--text-1);
+      margin-bottom: 22px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+      font-weight: 400;
+      color: var(--text-2);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 13px 28px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1.5px solid transparent;
+    }
+    .btn-primary {
+      background: var(--amber);
+      color: #04080f;
+      border-color: var(--amber);
+    }
+    .btn-primary:hover {
+      background: #fbbf24;
+      border-color: #fbbf24;
+      box-shadow: 0 0 28px rgba(245,158,11,0.4), 0 4px 16px rgba(0,0,0,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--amber);
+      border-color: rgba(245,158,11,0.5);
+    }
+    .btn-secondary:hover {
+      background: var(--amber-dim);
+      border-color: var(--amber);
+      transform: translateY(-1px);
+    }
+
+    /* ── Scroll indicator ─────────────────────────────────────── */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.45;
+    }
+    .scroll-indicator span {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+    .scroll-chevron {
+      width: 20px;
+      height: 20px;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+    .scroll-chevron::before, .scroll-chevron::after {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 2px;
+      background: var(--text-2);
+      border-radius: 1px;
+      margin: 0 auto;
+    }
+    .scroll-chevron::before { transform: translateX(-2.5px) rotate(40deg); }
+    .scroll-chevron::after  { transform: translateX(2.5px)  rotate(-40deg); margin-top: 1px; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SECTIONS — shared
+    ═══════════════════════════════════════════════════════════ */
+    .section {
+      padding: 96px 24px;
+    }
+    .section-navy { background: var(--bg-navy); }
+    .section-dark { background: var(--bg); }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--amber);
+      margin-bottom: 14px;
+      opacity: 0.8;
+    }
+
+    .section-title {
+      font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-1);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-2);
+      max-width: 620px;
+      line-height: 1.75;
+      margin-bottom: 56px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       WHY IT MATTERS — 3 cards
+    ═══════════════════════════════════════════════════════════ */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 800px) {
+      .cards-row { grid-template-columns: 1fr; }
+    }
+
+    .matter-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 26px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .matter-card:hover {
+      border-color: var(--border-hi);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .matter-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245,158,11,0.25), transparent);
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 18px;
+      display: block;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .card-text {
+      font-size: 0.865rem;
+      color: var(--text-2);
+      line-height: 1.78;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BUTTERFLY DIAGRAM SECTION
+    ═══════════════════════════════════════════════════════════ */
+    .butterfly-wrap {
+      margin-top: 0;
+    }
+
+    .butterfly-image-container {
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(245,158,11,0.08),
+        0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    .butterfly-image-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .butterfly-caption {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: var(--text-2);
+      line-height: 1.72;
+      max-width: 780px;
+    }
+
+    .butterfly-credit {
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: var(--text-3);
+      letter-spacing: 0.02em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       DATASET SECTION — 2 column
+    ═══════════════════════════════════════════════════════════ */
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    @media (max-width: 780px) {
+      .dataset-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .dataset-desc {
+      font-size: 0.9rem;
+      color: var(--text-2);
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .dataset-sub {
+      font-size: 0.82rem;
+      color: var(--text-3);
+      line-height: 1.75;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 9px 20px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1.5px solid rgba(245,158,11,0.45);
+      color: var(--amber);
+      background: transparent;
+      margin-top: 20px;
+    }
+    .btn-small:hover {
+      background: var(--amber-dim);
+      border-color: var(--amber);
+    }
+
+    /* Stat boxes — dashboard metric style */
+    .stat-boxes {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-box::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 16px; bottom: 16px;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(245,158,11,0.5), transparent);
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    .site-footer {
+      background: #020509;
+      border-top: 1px solid var(--border);
+      padding: 40px 24px 28px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .footer-brand {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+    .footer-nav {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .footer-nav a {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      transition: color 0.18s;
+    }
+    .footer-nav a:hover { color: var(--text-1); }
+
+    .footer-github {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity 0.18s;
+    }
+    .footer-github:hover { opacity: 0.8; }
+
+    .footer-meta {
+      font-size: 0.7rem;
+      color: var(--text-3);
+      letter-spacing: 0.01em;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav class="site-nav">
+  <span class="nav-brand">Solar Monitor</span>
+  <ul class="nav-links">
+    <li><a href="./index.html" class="nav-active">Home</a></li>
+    <li><a href="../index.html">Forecast</a></li>
+    <li><a href="../dataset/index.html">Dataset</a></li>
+    <li><a href="../about/index.html">About</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-overline">Real-time solar activity forecasting</p>
+    <h1 class="hero-headline">Predicting the<br>Sun's Activity</h1>
+    <p class="hero-subtitle">
+      Machine learning models trained on 275 years of solar observation data,
+      forecasting short, medium and long-term solar activity.
+    </p>
+    <div class="hero-buttons">
+      <a href="../index.html" class="btn btn-primary">View Forecast &rarr;</a>
+      <a href="../dataset/index.html" class="btn btn-secondary">Explore Dataset &rarr;</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-chevron"></div>
+  </div>
+</section>
+
+<!-- ═══════════ WHY IT MATTERS ═══════════ -->
+<section class="section section-navy">
+  <div class="section-inner">
+    <p class="section-label">Solar impact</p>
+    <h2 class="section-title">Why Solar Activity Matters</h2>
+    <div class="cards-row">
+
+      <div class="matter-card">
+        <span class="card-icon" aria-hidden="true">&#x1F6F0;</span>
+        <h3 class="card-title">Space Weather</h3>
+        <p class="card-text">
+          Solar flares and coronal mass ejections can disable satellites, disrupt GPS systems, and
+          endanger astronauts. Forecasting activity gives operators time to protect critical infrastructure.
+        </p>
+      </div>
+
+      <div class="matter-card">
+        <span class="card-icon" aria-hidden="true">&#x26A1;</span>
+        <h3 class="card-title">Power Grids</h3>
+        <p class="card-text">
+          The 1989 Quebec blackout and the 1859 Carrington Event demonstrated how intense solar storms
+          can induce currents that overwhelm electrical grids. Accurate forecasting enables preventative action.
+        </p>
+      </div>
+
+      <div class="matter-card">
+        <span class="card-icon" aria-hidden="true">&#x1F4E1;</span>
+        <h3 class="card-title">Communications</h3>
+        <p class="card-text">
+          High-frequency radio communications, used by aviation and emergency services, are severely
+          disrupted during solar maximum. Solar forecasting supports mission-critical planning.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ BUTTERFLY DIAGRAM ═══════════ -->
+<section class="section section-dark">
+  <div class="section-inner">
+    <p class="section-label">Historical record</p>
+    <h2 class="section-title">The Maunder Butterfly Diagram</h2>
+    <p class="section-subtitle">
+      Sunspot latitude distribution across Solar Cycles 12&ndash;24 &mdash;
+      Royal Greenwich Observatory data (1874&ndash;2013).
+    </p>
+    <div class="butterfly-wrap">
+      <div class="butterfly-image-container">
+        <img src="./butterfly.png"
+             alt="Maunder Butterfly Diagram showing sunspot latitude distribution from 1874 to 2013"
+             loading="lazy" />
+      </div>
+      <p class="butterfly-caption">
+        Each dot represents a sunspot group observation. The characteristic butterfly wing pattern emerges
+        as sunspots migrate from high latitudes at cycle start toward the equator at cycle end &mdash;
+        a phenomenon known as Sp&ouml;rer's Law.
+      </p>
+      <p class="butterfly-credit">
+        Data: Royal Greenwich Observatory &nbsp;&middot;&nbsp; Visualisation: Alfie Mowle
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DATASET ═══════════ -->
+<section class="section section-navy">
+  <div class="section-inner">
+    <p class="section-label">Data sources</p>
+    <h2 class="section-title">About the Data</h2>
+    <div class="dataset-grid">
+
+      <div>
+        <p class="dataset-desc">
+          The International Sunspot Number (ISN) is produced by the Royal Observatory of Belgium
+          and represents the global standard measure of solar activity. Version 2.0 spans January 1749
+          to present, covering Solar Cycles 1 through 25 &mdash; over 275 years of continuous observation.
+        </p>
+        <a href="https://www.sidc.be/silso/" target="_blank" rel="noopener" class="btn-small">
+          Visit SILSO &rarr;
+        </a>
+        <p class="dataset-sub">
+          Historical sunspot group latitude data is sourced from the Royal Greenwich Observatory (RGO)
+          and NOAA archives, spanning 1874 to 2013 across Solar Cycles 12 to 24. This dataset enables
+          the butterfly diagram visualisation above.
+        </p>
+      </div>
+
+      <div class="stat-boxes">
+        <div class="stat-box">
+          <span class="stat-number">76,030</span>
+          <span class="stat-label">Daily Observations<br>in the SILSO ISN dataset</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">275+</span>
+          <span class="stat-label">Years of Data<br>January 1749 to present</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">1&ndash;25</span>
+          <span class="stat-label">Solar Cycles covered<br>complete long-term record</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <span class="footer-brand">Solar Activity Forecast &nbsp;&middot;&nbsp; Built by Alfie Mowle</span>
+      <ul class="footer-nav">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="../index.html">Forecast</a></li>
+        <li><a href="../dataset/index.html">Dataset</a></li>
+        <li><a href="../about/index.html">About</a></li>
+      </ul>
+      <a href="https://github.com/alfiemowle" target="_blank" rel="noopener" class="footer-github">
+        GitHub &rarr;
+      </a>
+    </div>
+    <p class="footer-meta">
+      Data: SILSO ISN v2.0 &nbsp;&middot;&nbsp; Royal Observatory of Belgium &nbsp;&middot;&nbsp;
+      Model: XGBoost Multi-Step Ensemble
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

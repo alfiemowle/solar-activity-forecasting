@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar Activity Forecast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── Reset ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens ────────────────────────────────────── */
+    :root {
+      --bg:           #080d14;
+      --surface:      #0d1520;
+      --surface-hi:   #111c2e;
+      --border:       #192438;
+      --border-hi:    #253650;
+      --text-1:       #e2e8f2;
+      --text-2:       #7a90ae;
+      --text-3:       #3d5170;
+      --amber:        #f59e0b;
+      --amber-dim:    rgba(245,158,11,0.10);
+      --amber-glow:   rgba(245,158,11,0.06);
+      --blue:         #60a5fa;
+      --orange:       #f97316;
+      --grid:         #0f1928;
+      --tick:         #3d5170;
+      --radius:       14px;
+      --radius-sm:    9px;
+    }
+
+    /* ── Base ──────────────────────────────────────── */
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 40% at 50% 0%,
+          rgba(245,158,11,0.055) 0%,
+          transparent 65%);
+      color: var(--text-2);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 0 20px 72px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout wrapper ────────────────────────────── */
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════ */
+    .page-header {
+      text-align: center;
+      padding: 56px 0 48px;
+      position: relative;
+    }
+
+    .header-overline {
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--amber);
+      opacity: 0.7;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      /* Gradient: bright white → amber */
+      background: linear-gradient(155deg, var(--text-1) 40%, #fbbf24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+
+    .page-subtitle {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--text-3);
+      letter-spacing: 0.02em;
+      margin-bottom: 28px;
+    }
+
+    /* ── Model selector ────────────────────────── */
+    .model-selector-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .model-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--surface);
+      border: 1px solid var(--border-hi);
+      border-radius: 100px;
+      padding: 10px 18px 10px 14px;
+      color: var(--amber);
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .model-pill-btn:hover {
+      background: var(--surface-hi);
+      border-color: rgba(245,158,11,0.5);
+      box-shadow: 0 0 0 4px var(--amber-glow), 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(245,158,11,0.6);
+    }
+    .pill-arrow {
+      font-size: 0.58rem;
+      color: var(--amber);
+      opacity: 0.55;
+      transition: transform 0.2s;
+      margin-left: 1px;
+    }
+    .model-pill-btn.open .pill-arrow { transform: rotate(180deg); }
+
+    .model-dropdown {
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface-hi);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      padding: 5px;
+      min-width: 230px;
+      z-index: 200;
+      display: none;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 20px 56px rgba(0,0,0,0.65);
+    }
+    .model-dropdown.open { display: block; }
+
+    .model-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.83rem;
+      color: var(--text-2);
+      transition: background 0.12s, color 0.12s;
+    }
+    .model-option:hover:not(.model-option-locked) {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-1);
+    }
+    .model-option.model-option-active {
+      color: var(--amber);
+      background: var(--amber-dim);
+    }
+    .model-option.model-option-locked {
+      color: var(--text-3);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .opt-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: currentColor;
+    }
+    .opt-coming-soon {
+      margin-left: auto;
+      font-size: 0.63rem;
+      font-weight: 500;
+      color: var(--text-3);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 2px 7px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ═══════════════════════════════════════════
+       MODEL DESCRIPTION CARD
+    ═══════════════════════════════════════════ */
+    .model-desc-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px 20px 28px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .model-desc-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      bottom: 14px;
+      width: 2px;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(245,158,11,0.55),
+        transparent
+      );
+      border-radius: 0 1px 1px 0;
+    }
+    .model-desc-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 7px;
+    }
+    #model-desc-text {
+      font-size: 0.855rem;
+      color: var(--text-2);
+      line-height: 1.78;
+    }
+
+    /* ═══════════════════════════════════════════
+       PANELS
+    ═══════════════════════════════════════════ */
+    .panels-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      position: relative;
+    }
+
+    /* Active panel: amber top shimmer */
+    .panel-card--active {
+      box-shadow: inset 0 1px 0 rgba(245,158,11,0.28);
+      border-color: var(--border-hi);
+    }
+
+    /* Locked panel: subdued */
+    .panel-card--locked {
+      opacity: 0.6;
+    }
+
+    /* ── Panel header ──────────────────────────── */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .panel-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 0.975rem;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.01em;
+    }
+
+    .panel-period-tag {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-3);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 2px 10px;
+      letter-spacing: 0.03em;
+    }
+
+    .panel-lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 10px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Metrics cluster ───────────────────────── */
+    .metrics-cluster {
+      display: flex;
+      align-items: stretch;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .metric-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 18px;
+      gap: 3px;
+      min-width: 72px;
+    }
+    .metric-lbl {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+    }
+    .metric-num {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .metric-num--dim { color: var(--border-hi); }
+    .metric-sep {
+      width: 1px;
+      background: var(--border);
+      margin: 6px 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Chart legend ──────────────────────────── */
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--grid);
+    }
+    .lg-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.73rem;
+      color: var(--text-3);
+      letter-spacing: 0.01em;
+    }
+    .lg-swatch {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .lg-swatch::before { content: ''; display: block; }
+
+    .lg-swatch--solid-white::before {
+      width: 22px; height: 2px;
+      background: var(--text-1);
+      border-radius: 1px;
+    }
+    .lg-swatch--dash-amber::before {
+      width: 22px; height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--amber) 0, var(--amber) 5px,
+        transparent 5px, transparent 9px
+      );
+    }
+    .lg-swatch--solid-amber::before {
+      width: 22px; height: 2.5px;
+      background: var(--amber);
+      border-radius: 1px;
+    }
+    .lg-swatch--dot-orange::before {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    /* ── Chart wrapper ─────────────────────────── */
+    .chart-wrapper {
+      position: relative;
+      height: 380px;
+    }
+
+    /* ── Detail list ───────────────────────────── */
+    .detail-list {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .detail-row {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key {
+      flex: 0 0 120px;
+      font-size: 0.66rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-3);
+      padding-top: 1px;
+    }
+    .detail-val {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    /* ── Locked body ───────────────────────────── */
+    .locked-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 20px 4px 28px;
+    }
+    .locked-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .locked-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+    .locked-desc {
+      font-size: 0.845rem;
+      color: var(--text-3);
+      line-height: 1.72;
+      max-width: 560px;
+    }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-3);
+      letter-spacing: 0.01em;
+    }
+  </style>
+<style>
+  /* ── Site nav (injected) ─────────────────────────────────── */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 52px;
+    background: rgba(8,13,20,0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid #192438;
+    margin: 0 -20px;
+  }
+  .site-nav .nav-brand {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #f59e0b;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .site-nav .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .site-nav .nav-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #7a90ae;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: color 0.18s;
+  }
+  .site-nav .nav-links a:hover { color: #e2e8f2; }
+  .site-nav .nav-links a.nav-active { color: #f59e0b; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="./home/index.html" class="nav-brand">Solar Monitor</a>
+  <ul class="nav-links">
+    <li><a href="./home/index.html">Home</a></li>
+    <li><a href="./index.html" class="nav-active">Forecast</a></li>
+    <li><a href="./dataset/index.html">Dataset</a></li>
+    <li><a href="./about/index.html">About</a></li>
+  </ul>
+</nav>
+<div class="wrap">
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="page-header">
+  <p class="header-overline">Real-time solar monitoring</p>
+  <h1>Solar Activity<br>Forecast</h1>
+  <p class="page-subtitle">Daily International Sunspot Number</p>
+
+  <div class="model-selector-wrapper" id="model-selector-wrapper">
+    <button class="model-pill-btn" id="model-pill-btn"
+            aria-haspopup="listbox" aria-expanded="false">
+      <span class="pill-dot" id="pill-dot"></span>
+      <span id="pill-label">XGBoost</span>
+      <span class="pill-arrow">▾</span>
+    </button>
+    <div class="model-dropdown" id="model-dropdown" role="listbox">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MODEL DESCRIPTION ═══════════ -->
+<div class="model-desc-card" id="model-desc-card">
+  <p class="model-desc-eyebrow">Architecture Overview</p>
+  <p id="model-desc-text">Loading…</p>
+</div>
+
+<!-- ═══════════ PANELS ═══════════ -->
+<div class="panels-stack">
+
+  <!-- Panel 1 — Short Term (active) -->
+  <section class="panel-card panel-card--active" id="panel-short">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h2 class="panel-title">Short Term Forecast</h2>
+        <span class="panel-period-tag">30 Days</span>
+      </div>
+      <div class="metrics-cluster">
+        <div class="metric-cell">
+          <span class="metric-lbl">R²</span>
+          <span class="metric-num" id="badge-r2">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">MAE</span>
+          <span class="metric-num" id="badge-mae">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">RMSE</span>
+          <span class="metric-num" id="badge-rmse">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML legend (Chart.js built-in legend disabled) -->
+    <div class="chart-legend">
+      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-white"></span>Actual ISN</span>
+      <span class="lg-item"><span class="lg-swatch lg-swatch--dash-amber"></span>Validation prediction</span>
+      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-amber"></span>30-Day Forecast</span>
+      <span class="lg-item"><span class="lg-swatch lg-swatch--dot-orange"></span>Provisional reading</span>
+    </div>
+
+    <div class="chart-wrapper">
+      <canvas id="chart-main"></canvas>
+    </div>
+
+    <div class="detail-list" id="model-detail-list">
+      <!-- injected by JS -->
+    </div>
+  </section>
+
+  <!-- Panel 2 — Medium Term (locked) -->
+  <section class="panel-card panel-card--locked">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h2 class="panel-title">Medium Term Forecast</h2>
+        <span class="panel-period-tag">12 Months</span>
+        <span class="panel-lock-badge">
+          <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="4" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M3 4V3a1.5 1.5 0 0 1 3 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Coming Soon
+        </span>
+      </div>
+      <div class="metrics-cluster">
+        <div class="metric-cell">
+          <span class="metric-lbl">R²</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">MAE</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">RMSE</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="locked-body">
+      <div class="locked-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <p class="locked-desc">
+        XGBoost multi-step ensemble trained on monthly SILSO data. Will provide
+        12-month ahead forecasts with uncertainty bands calibrated from historical validation.
+      </p>
+    </div>
+  </section>
+
+  <!-- Panel 3 — Long Term (locked) -->
+  <section class="panel-card panel-card--locked">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h2 class="panel-title">Long Term Forecast</h2>
+        <span class="panel-period-tag">11 Years</span>
+        <span class="panel-lock-badge">
+          <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="4" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M3 4V3a1.5 1.5 0 0 1 3 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Coming Soon
+        </span>
+      </div>
+      <div class="metrics-cluster">
+        <div class="metric-cell">
+          <span class="metric-lbl">R²</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">MAE</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric-cell">
+          <span class="metric-lbl">RMSE</span>
+          <span class="metric-num metric-num--dim">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="locked-body">
+      <div class="locked-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <p class="locked-desc">
+        XGBoost cycle envelope model trained on smoothed monthly SILSO data with solar
+        cycle phase features. Will forecast the broad shape and amplitude of the next
+        solar cycle (11 years) with widening uncertainty bands.
+      </p>
+    </div>
+  </section>
+
+</div><!-- /panels-stack -->
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="page-footer">
+  <span>Data: SILSO ISN v2.0 · Royal Observatory of Belgium</span>
+  <span id="footer-right">—</span>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   MODEL CONFIGURATION
+   Add new architectures here. Set available: true to unlock.
+   paths are relative to solar_forecast/website/.
+═══════════════════════════════════════════════════════════ */
+const MODEL_CONFIG = {
+  xgboost: {
+    id:        "xgboost",
+    label:     "XGBoost",
+    available: true,
+    description:
+      "XGBoost (Extreme Gradient Boosting) is a tree-based ensemble method that builds " +
+      "models sequentially, each correcting errors of the previous. For solar forecasting " +
+      "it uses a direct multi-step strategy — separate ensembles trained independently for " +
+      "each forecast horizon, avoiding compounding errors from autoregressive chaining. " +
+      "Seven models per horizon are trained with different random seeds and their predictions " +
+      "averaged for robustness.",
+    paths: {
+      validation: "../outputs/validation.json",
+      forecast:   "../outputs/forecast.json",
+      metadata:   "../outputs/metadata.json",
+    },
+    details: [
+      { key: "Model",         val: "XGBoost Daily Multi-Step Ensemble" },
+      { key: "Training data", val: "1818 to present · 76,030 daily observations" },
+      { key: "Features",      val: "30+ causal features including Carrington rotation lags, EMAs, rolling statistics, solar cycle encodings" },
+      { key: "Approach",      val: "Direct multi-step · 7 seeds · horizons +1 +3 +7 +14 +21 +30 days" },
+      { key: "Uncertainty",   val: "Calibrated from 730-day held-out window" },
+    ],
+  },
+  rf: {
+    id:        "rf",
+    label:     "Random Forest",
+    available: false,
+    description: "Random Forest is an ensemble method that builds multiple decision trees independently and averages their predictions. Each tree is trained on a random subset of data and features, providing natural variance estimates for uncertainty quantification.",
+    paths: {
+      validation: "../outputs/rf/validation.json",
+      forecast:   "../outputs/rf/forecast.json",
+      metadata:   "../outputs/rf/metadata.json",
+    },
+    details: [],
+  },
+  lstm: {
+    id:        "lstm",
+    label:     "LSTM",
+    available: false,
+    description: "Long Short-Term Memory (LSTM) networks are recurrent neural networks designed to learn long-range temporal dependencies. For solar forecasting they capture multi-year solar cycle patterns alongside short-term variability without manual feature engineering.",
+    paths: {
+      validation: "../outputs/lstm/validation.json",
+      forecast:   "../outputs/lstm/forecast.json",
+      metadata:   "../outputs/lstm/metadata.json",
+    },
+    details: [],
+  },
+  transformer: {
+    id:        "transformer",
+    label:     "Transformer",
+    available: false,
+    description: "Transformer models use self-attention mechanisms to model dependencies across the full input sequence without recurrence. For time series forecasting they capture complex seasonal and cyclical patterns at multiple temporal scales simultaneously.",
+    paths: {
+      validation: "../outputs/transformer/validation.json",
+      forecast:   "../outputs/transformer/forecast.json",
+      metadata:   "../outputs/transformer/metadata.json",
+    },
+    details: [],
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let activeModelId = "xgboost";
+let chartInstance = null;
+
+/* ═══════════════════════════════════════════════════════════
+   CHART COLOUR PALETTE
+═══════════════════════════════════════════════════════════ */
+const AMBER = "#f59e0b";
+const WHITE = "#e2e8f2";
+const GRID  = "#0f1928";
+const TICK  = "#3d5170";
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function fmt(v, dp = 2) {
+  return v == null ? "—" : Number(v).toFixed(dp);
+}
+
+function fmtDate(iso) {
+  return new Date(iso + "T12:00:00Z")
+    .toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function fmtDateLong(iso) {
+  return new Date(iso + "T12:00:00Z")
+    .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+async function loadJSON(path) {
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(`Failed to load ${path} (${r.status})`);
+  return r.json();
+}
+
+function makeDateRange(startDate, days) {
+  return Array.from({ length: days }, (_, i) => {
+    const d = new Date(startDate);
+    d.setUTCDate(d.getUTCDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DROPDOWN
+═══════════════════════════════════════════════════════════ */
+function initDropdown() {
+  const dd  = document.getElementById("model-dropdown");
+  const btn = document.getElementById("model-pill-btn");
+
+  Object.values(MODEL_CONFIG).forEach(cfg => {
+    const opt = document.createElement("div");
+    opt.className = "model-option" +
+      (cfg.id === activeModelId ? " model-option-active" : "") +
+      (!cfg.available            ? " model-option-locked" : "");
+    opt.setAttribute("role", "option");
+    opt.dataset.modelId = cfg.id;
+    opt.innerHTML =
+      `<span class="opt-dot"></span>` +
+      `<span>${cfg.label}</span>` +
+      (!cfg.available
+        ? `<span class="opt-coming-soon">Coming Soon</span>`
+        : "");
+
+    if (cfg.available) {
+      opt.addEventListener("click", () => { selectModel(cfg.id); closeDropdown(); });
+    }
+    dd.appendChild(opt);
+  });
+
+  btn.addEventListener("click", () => {
+    dd.classList.contains("open") ? closeDropdown() : openDropdown();
+  });
+  document.addEventListener("click", e => {
+    if (!document.getElementById("model-selector-wrapper").contains(e.target)) {
+      closeDropdown();
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeDropdown();
+  });
+}
+
+function openDropdown() {
+  document.getElementById("model-dropdown").classList.add("open");
+  document.getElementById("model-pill-btn").classList.add("open");
+  document.getElementById("model-pill-btn").setAttribute("aria-expanded", "true");
+}
+
+function closeDropdown() {
+  document.getElementById("model-dropdown").classList.remove("open");
+  document.getElementById("model-pill-btn").classList.remove("open");
+  document.getElementById("model-pill-btn").setAttribute("aria-expanded", "false");
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODEL SELECTION
+═══════════════════════════════════════════════════════════ */
+async function selectModel(modelId) {
+  if (modelId === activeModelId) return;
+  activeModelId = modelId;
+  const cfg = MODEL_CONFIG[modelId];
+  document.getElementById("pill-label").textContent = cfg.label;
+  document.querySelectorAll(".model-option").forEach(opt => {
+    opt.classList.toggle("model-option-active", opt.dataset.modelId === modelId);
+  });
+  await loadAndRender(modelId);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DATA LOADING & UI UPDATE
+═══════════════════════════════════════════════════════════ */
+async function loadAndRender(modelId) {
+  const cfg = MODEL_CONFIG[modelId];
+
+  ["badge-r2", "badge-mae", "badge-rmse"].forEach(id => {
+    document.getElementById(id).textContent = "…";
+  });
+  document.getElementById("model-desc-text").textContent = cfg.description;
+
+  try {
+    const [val, fc, meta] = await Promise.all([
+      loadJSON(cfg.paths.validation),
+      loadJSON(cfg.paths.forecast),
+      loadJSON(cfg.paths.metadata),
+    ]);
+
+    document.getElementById("badge-r2").textContent   = fmt(meta.validation_r2,   3);
+    document.getElementById("badge-mae").textContent  = fmt(meta.validation_mae,  2);
+    document.getElementById("badge-rmse").textContent = fmt(meta.validation_rmse, 2);
+
+    document.getElementById("footer-right").textContent =
+      `Generated ${fmtDateLong(meta.date_generated.slice(0, 10))} · ` +
+      `Data current to ${fmtDateLong(meta.last_data_date)}`;
+
+    updateDetailList(cfg);
+    renderChart(val, fc, meta);
+
+  } catch (err) {
+    console.error("Failed to load model data:", err);
+    ["badge-r2", "badge-mae", "badge-rmse"].forEach(id => {
+      document.getElementById(id).textContent = "ERR";
+    });
+  }
+}
+
+function updateDetailList(cfg) {
+  const list = document.getElementById("model-detail-list");
+  if (!cfg.details.length) { list.innerHTML = ""; return; }
+  list.innerHTML = cfg.details.map(d =>
+    `<div class="detail-row">
+       <span class="detail-key">${d.key}</span>
+       <span class="detail-val">${d.val}</span>
+     </div>`
+  ).join("");
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHART
+═══════════════════════════════════════════════════════════ */
+function renderChart(val, fc, meta) {
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+  const lastDataDate = meta.last_data_date;
+
+  /* ── Date ranges ── */
+  const ldDate = new Date(lastDataDate + "T12:00:00Z");
+
+  // Seg2: LAST_DATA_DATE−29 → LAST_DATA_DATE  (30-day validation window)
+  const seg2Start = new Date(ldDate);
+  seg2Start.setUTCDate(seg2Start.getUTCDate() - 29);
+  const seg2Dates = makeDateRange(seg2Start, 30);
+
+  // Seg1: 30 days before Seg2  (historical context)
+  const seg1Start = new Date(seg2Start);
+  seg1Start.setUTCDate(seg1Start.getUTCDate() - 30);
+  const seg1Dates = makeDateRange(seg1Start, 30);
+
+  // Seg3: forecast (first 30 days from forecast.json)
+  const seg3Dates = fc.slice(0, 30).map(f => f.date);
+
+  /* ── Look-up maps ── */
+  const valMap  = Object.fromEntries(val.map(v => [v.date, v]));
+  const fcMap   = Object.fromEntries(fc.map(f => [f.date, f]));
+  const seg2Set = new Set(seg2Dates);
+
+  const seg1HasData = seg1Dates.some(d => valMap[d] != null);
+
+  /* ── X-axis (always 90 days) ── */
+  const allDates  = [...seg1Dates, ...seg2Dates, ...seg3Dates];
+  const allLabels = allDates.map(fmtDate);
+
+  const PRED_START_IDX = 30;  // Seg2 start
+  const LAST_DATA_IDX  = 59;  // LAST_DATA_DATE
+
+  /* ── Dataset arrays ── */
+  const actualData  = allDates.map(d => valMap[d]?.actual ?? null);
+  const valPredData = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.predicted   ?? null) : null);
+  const valHiData   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.upper_bound ?? null) : null);
+  const valLoData   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.lower_bound ?? null) : null);
+
+  const stitchVal  = actualData[LAST_DATA_IDX];
+  const fcPredData = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.predicted   ?? null));
+  const fcHiData   = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.upper_bound ?? null));
+  const fcLoData   = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.lower_bound ?? null));
+
+  const provData = allDates.map(d => {
+    const e = valMap[d];
+    return (e?.provisional && e.actual != null) ? e.actual : null;
+  });
+
+  /* ── Plugin: segment background shading ── */
+  const segmentBgPlugin = {
+    id: "segmentBg",
+    beforeDraw(chart) {
+      const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+      const px = idx => clamp(x.getPixelForValue(idx), left, right);
+      ctx.save();
+      ctx.fillStyle = "rgba(77,148,255,0.032)";
+      ctx.fillRect(left, top, px(PRED_START_IDX - 0.5) - left, bottom - top);
+      ctx.fillStyle = "rgba(245,158,11,0.042)";
+      ctx.fillRect(px(LAST_DATA_IDX + 0.5), top, right - px(LAST_DATA_IDX + 0.5), bottom - top);
+      ctx.restore();
+    },
+    afterDraw(chart) {
+      if (seg1HasData) return;
+      const { ctx, chartArea: { top, bottom, left }, scales: { x } } = chart;
+      const midX = (left + x.getPixelForValue(PRED_START_IDX - 0.5)) / 2;
+      const midY = (top + bottom) / 2;
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(61,81,112,0.5)";
+      ctx.font = "500 11px Inter, sans-serif";
+      ctx.fillText("Historical context", midX, midY - 6);
+      ctx.fillStyle = "rgba(61,81,112,0.3)";
+      ctx.font = "400 9.5px Inter, sans-serif";
+      ctx.fillText("not in current data export", midX, midY + 10);
+      ctx.restore();
+    },
+  };
+
+  /* ── Plugin: vertical annotation lines ── */
+  const vLinesPlugin = {
+    id: "vLines",
+    afterDraw(chart) {
+      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+      [
+        { idx: PRED_START_IDX, label: "Prediction start", color: "rgba(245,158,11,0.65)" },
+        { idx: LAST_DATA_IDX,  label: "Last known data",  color: "rgba(226,232,242,0.40)" },
+      ].forEach(({ idx, label, color }) => {
+        const xp = x.getPixelForValue(idx);
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(xp, top);
+        ctx.lineTo(xp, bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = color;
+        ctx.font      = "500 9.5px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(label, xp, top + 13);
+        ctx.restore();
+      });
+    },
+  };
+
+  /* ── Build chart ── */
+  chartInstance = new Chart(document.getElementById("chart-main"), {
+    type: "line",
+    data: {
+      labels: allLabels,
+      datasets: [
+        /* 0 — Forecast band upper → fills to 1 */
+        { label: "Forecast upper",       data: fcHiData,   borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.14)", pointRadius: 0, fill: "+1", tension: 0.35, spanGaps: false },
+        /* 1 — Forecast band lower */
+        { label: "Forecast lower",       data: fcLoData,   borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false, tension: 0.35, spanGaps: false },
+        /* 2 — Validation band upper → fills to 3 */
+        { label: "Validation band upper",data: valHiData,  borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.08)", pointRadius: 0, fill: "+1", tension: 0.35, spanGaps: false },
+        /* 3 — Validation band lower */
+        { label: "Validation band lower",data: valLoData,  borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false, tension: 0.35, spanGaps: false },
+        /* 4 — Actual ISN */
+        { label: "Actual ISN",           data: actualData, borderColor: WHITE,          backgroundColor: "transparent",            borderWidth: 1.75, pointRadius: 0, tension: 0.35, spanGaps: false },
+        /* 5 — Validation prediction (dashed amber) */
+        { label: "Validation prediction",data: valPredData,borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 1.75, borderDash: [5, 3], pointRadius: 0, tension: 0.35, spanGaps: false },
+        /* 6 — 30-day forecast (solid amber) */
+        { label: "30-Day Forecast",      data: fcPredData, borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 2.25, pointRadius: 0, tension: 0.35, spanGaps: false },
+        /* 7 — Provisional dots */
+        { label: "Provisional reading",  data: provData,   borderColor: "transparent", backgroundColor: "#f97316",                pointRadius: 4.5, pointStyle: "circle", showLine: false, spanGaps: false },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { top: 24, right: 4 } },
+      plugins: {
+        legend: { display: false },   // HTML legend used instead
+        tooltip: {
+          backgroundColor: "#111c2e",
+          borderColor: "#253650",
+          borderWidth: 1,
+          titleColor: WHITE,
+          bodyColor: "#7a90ae",
+          padding: 12,
+          boxPadding: 5,
+          titleFont: { family: "Inter", size: 12, weight: "600" },
+          bodyFont:  { family: "Inter", size: 12 },
+          filter: item => ![
+            "Forecast upper", "Forecast lower",
+            "Validation band upper", "Validation band lower",
+          ].includes(item.dataset.label),
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: TICK,
+            font: { family: "Inter", size: 11 },
+            maxRotation: 45,
+            autoSkip: true,
+            maxTicksLimit: 12,
+          },
+          grid: { color: GRID },
+          border: { color: GRID },
+        },
+        y: {
+          ticks: {
+            color: TICK,
+            font: { family: "Inter", size: 11 },
+          },
+          grid:   { color: GRID },
+          border: { color: GRID },
+          title: {
+            display: true,
+            text: "Daily Sunspot Number (ISN)",
+            color: TICK,
+            font: { family: "Inter", size: 11, weight: "500" },
+          },
+        },
+      },
+    },
+    plugins: [segmentBgPlugin, vLinesPlugin],
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+async function main() {
+  initDropdown();
+  document.getElementById("model-desc-text").textContent =
+    MODEL_CONFIG[activeModelId].description;
+  await loadAndRender(activeModelId);
+}
+
+main().catch(err => {
+  console.error(err);
+  document.body.insertAdjacentHTML("beforeend",
+    `<p style="color:#f87171;text-align:center;margin-top:3rem;font-family:Inter,sans-serif;font-size:0.85rem;">
+       Error loading data: ${err.message}<br>
+       <span style="color:#3d5170">Serve from solar_forecast/ with: python -m http.server 8080</span>
+     </p>`
+  );
+});
+</script>
+</body>
+</html>
