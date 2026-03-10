@@ -731,9 +731,9 @@ const MODEL_CONFIG = {
       "Seven models per horizon are trained with different random seeds and their predictions " +
       "averaged for robustness.",
     paths: {
-      validation: "../outputs/validation.json",
-      forecast:   "../outputs/forecast.json",
-      metadata:   "../outputs/metadata.json",
+      validation: "outputs/validation.json",
+      forecast:   "outputs/forecast.json",
+      metadata:   "outputs/metadata.json",
     },
     details: [
       { key: "Model",         val: "XGBoost Daily Multi-Step Ensemble" },
@@ -749,9 +749,9 @@ const MODEL_CONFIG = {
     available: false,
     description: "Random Forest is an ensemble method that builds multiple decision trees independently and averages their predictions. Each tree is trained on a random subset of data and features, providing natural variance estimates for uncertainty quantification.",
     paths: {
-      validation: "../outputs/rf/validation.json",
-      forecast:   "../outputs/rf/forecast.json",
-      metadata:   "../outputs/rf/metadata.json",
+      validation: "outputs/rf/validation.json",
+      forecast:   "outputs/rf/forecast.json",
+      metadata:   "outputs/rf/metadata.json",
     },
     details: [],
   },
@@ -761,9 +761,9 @@ const MODEL_CONFIG = {
     available: false,
     description: "Long Short-Term Memory (LSTM) networks are recurrent neural networks designed to learn long-range temporal dependencies. For solar forecasting they capture multi-year solar cycle patterns alongside short-term variability without manual feature engineering.",
     paths: {
-      validation: "../outputs/lstm/validation.json",
-      forecast:   "../outputs/lstm/forecast.json",
-      metadata:   "../outputs/lstm/metadata.json",
+      validation: "outputs/lstm/validation.json",
+      forecast:   "outputs/lstm/forecast.json",
+      metadata:   "outputs/lstm/metadata.json",
     },
     details: [],
   },
@@ -773,9 +773,9 @@ const MODEL_CONFIG = {
     available: false,
     description: "Transformer models use self-attention mechanisms to model dependencies across the full input sequence without recurrence. For time series forecasting they capture complex seasonal and cyclical patterns at multiple temporal scales simultaneously.",
     paths: {
-      validation: "../outputs/transformer/validation.json",
-      forecast:   "../outputs/transformer/forecast.json",
-      metadata:   "../outputs/transformer/metadata.json",
+      validation: "outputs/transformer/validation.json",
+      forecast:   "outputs/transformer/forecast.json",
+      metadata:   "outputs/transformer/metadata.json",
     },
     details: [],
   },
