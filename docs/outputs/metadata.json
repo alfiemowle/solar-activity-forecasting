@@ -1,5 +1,5 @@
 {
-  "date_generated": "2026-03-10T22:03:08.187147+00:00",
+  "date_generated": "2026-03-11T18:45:40.083740+00:00",
   "data_start": "1819-01-08",
   "data_end": "2026-02-28",
   "last_data_date": "2026-02-28",
@@ -23,12 +23,12 @@
   "ensemble_size": 7,
   "forecast_horizon_days": 30,
   "validation_window_days": 30,
-  "r2_point": 0.655869,
-  "r2_trend": -0.287868,
-  "mae_point": 23.3287,
-  "rmse_point": 28.0273,
-  "mae_trend": 46.8567,
-  "rmse_trend": 54.2194,
+  "r2_point": 0.988754,
+  "r2_trend": -0.136518,
+  "mae_point": 3.5693,
+  "rmse_point": 5.0667,
+  "mae_trend": 43.9057,
+  "rmse_trend": 50.934,
   "leakage_check": "direct multi-step -- each horizon model trained independently on data before cutoff, no autoregressive chaining",
   "uncertainty_method": "calibrated RMSE on trailing CAL_WINDOW training rows, 80pct prediction interval (1.28 sigma)",
   "note": "Forecast anchored to last available SILSO data date, not system date. SILSO daily data typically lags 3-7 days behind current date.",
@@ -51,14 +51,40 @@
     ],
     "ensemble_size": 7,
     "smooth_window": 25,
-    "r2_point": -0.236235,
-    "r2_trend": 0.186427,
-    "mae_point": 35.8025,
-    "rmse_point": 46.4145,
-    "mae_trend": 12.6188,
-    "rmse_trend": 16.1259,
+    "r2_point": 0.001289,
+    "r2_trend": 0.464065,
+    "mae_point": 32.696,
+    "rmse_point": 41.718,
+    "mae_trend": 9.9639,
+    "rmse_trend": 13.0883,
     "uncertainty_method": "calibrated RMSE, 80pct PI (1.28 sigma)",
-    "metric_note": "r2_point vs raw daily ISN; r2_trend vs 25-day trailing smoothed ISN"
+    "metric_note": "r2_point vs raw daily ISN; r2_trend vs 25-day trailing smoothed ISN",
+    "config": {
+      "ensemble_seeds": [
+        42,
+        7,
+        123,
+        1,
+        2,
+        3,
+        99
+      ],
+      "cal_window": 730,
+      "smooth_window": 25,
+      "weight_halflife": 90,
+      "train_start_date": "2010-01-01",
+      "xgb_params": {
+        "n_estimators": 500,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 5,
+        "reg_alpha": 0.1,
+        "reg_lambda": 1.5,
+        "gamma": 0.05
+      }
+    }
   },
   "long": {
     "model_name": "xgboost_long_v2",
@@ -82,12 +108,59 @@
       144
     ],
     "ensemble_size": 7,
-    "r2_point": 0.906287,
-    "r2_trend": 0.784369,
-    "mae_point": 12.0248,
-    "rmse_point": 16.4976,
-    "mae_trend": 19.1714,
-    "rmse_trend": 25.0251,
-    "uncertainty_method": "calibrated RMSE, 80pct PI (1.28 sigma)"
+    "r2_point": 0.91585,
+    "r2_trend": 0.817133,
+    "mae_point": 10.4831,
+    "rmse_point": 15.6332,
+    "mae_trend": 16.9192,
+    "rmse_trend": 23.0457,
+    "uncertainty_method": "calibrated RMSE, 80pct PI (1.28 sigma)",
+    "config": {
+      "ensemble_seeds": [
+        42,
+        7,
+        123,
+        1,
+        2,
+        3,
+        99
+      ],
+      "cal_window": 120,
+      "xgb_params": {
+        "n_estimators": 500,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 3,
+        "reg_alpha": 0.1,
+        "reg_lambda": 1.5
+      }
+    }
+  },
+  "config": {
+    "ensemble_seeds": [
+      42,
+      7,
+      123,
+      1,
+      2,
+      3,
+      99
+    ],
+    "cal_window": 730,
+    "smooth_window": 25,
+    "weight_halflife": 90,
+    "xgb_params": {
+      "n_estimators": 600,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 5,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.5,
+      "gamma": 0.05
+    }
   }
 }
