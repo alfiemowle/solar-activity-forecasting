@@ -611,41 +611,7 @@
     </div>
   </section>
 
-  <!-- Panel 2 — Medium Term -->
-  <section class="panel-card panel-card--active" id="panel-medium">
-    <div class="panel-header">
-      <div class="panel-title-group">
-        <h2 class="panel-title">Medium Term Forecast</h2>
-        <span class="panel-period-tag">12 Months</span>
-      </div>
-      <div class="metrics-cluster">
-        <div class="metric-cell">
-          <span class="metric-lbl">R²</span>
-          <span class="metric-num" id="badge-med-r2">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">MAE</span>
-          <span class="metric-num" id="badge-med-mae">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">RMSE</span>
-          <span class="metric-num" id="badge-med-rmse">—</span>
-        </div>
-      </div>
-    </div>
-    <div class="chart-legend">
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-white"></span>Actual ISN</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--dash-amber"></span>Validation prediction</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-amber"></span>12-Month Forecast</span>
-    </div>
-    <div class="chart-wrapper">
-      <canvas id="chart-medium"></canvas>
-    </div>
-  </section>
-
-  <!-- Panel 3 — Long Term -->
+  <!-- Panel 2 — Long Term -->
   <section class="panel-card panel-card--active" id="panel-long">
     <div class="panel-header">
       <div class="panel-title-group">
@@ -677,6 +643,7 @@
     <div class="chart-wrapper">
       <canvas id="chart-long"></canvas>
     </div>
+    <div class="detail-list" id="model-detail-list-lng"></div>
   </section>
 
 </div><!-- /panels-stack -->
@@ -763,8 +730,7 @@ const MODEL_CONFIG = {
 ═══════════════════════════════════════════════════════════ */
 let activeModelId = "xgboost";
 let chartInstance       = null;
-let mediumChartInstance = null;
-let longChartInstance   = null;
+let longChartInstance = null;
 
 /* ═══════════════════════════════════════════════════════════
    CHART COLOUR PALETTE
@@ -930,17 +896,12 @@ function renderChart(val, fc, meta) {
   /* ── Date ranges ── */
   const ldDate = new Date(lastDataDate + "T12:00:00Z");
 
-  // Seg2: LAST_DATA_DATE−29 → LAST_DATA_DATE  (30-day validation window)
+  // Validation window: LAST_DATA_DATE-29 to LAST_DATA_DATE (30 days)
   const seg2Start = new Date(ldDate);
   seg2Start.setUTCDate(seg2Start.getUTCDate() - 29);
   const seg2Dates = makeDateRange(seg2Start, 30);
 
-  // Seg1: 30 days before Seg2  (historical context)
-  const seg1Start = new Date(seg2Start);
-  seg1Start.setUTCDate(seg1Start.getUTCDate() - 30);
-  const seg1Dates = makeDateRange(seg1Start, 30);
-
-  // Seg3: forecast (first 30 days from forecast.json)
+  // Forecast: first 30 days from forecast.json
   const seg3Dates = fc.slice(0, 30).map(f => f.date);
 
   /* ── Look-up maps ── */
@@ -948,14 +909,11 @@ function renderChart(val, fc, meta) {
   const fcMap   = Object.fromEntries(fc.map(f => [f.date, f]));
   const seg2Set = new Set(seg2Dates);
 
-  const seg1HasData = seg1Dates.some(d => valMap[d] != null);
-
-  /* ── X-axis (always 90 days) ── */
-  const allDates  = [...seg1Dates, ...seg2Dates, ...seg3Dates];
+  /* ── X-axis (60 days: 30 validation + 30 forecast) ── */
+  const allDates  = [...seg2Dates, ...seg3Dates];
   const allLabels = allDates.map(fmtDate);
 
-  const PRED_START_IDX = 30;  // Seg2 start
-  const LAST_DATA_IDX  = 59;  // LAST_DATA_DATE
+  const LAST_DATA_IDX = seg2Dates.length - 1;  // = 29
 
   /* ── Dataset arrays ── */
   const actualData  = allDates.map(d => valMap[d]?.actual ?? null);
@@ -973,7 +931,7 @@ function renderChart(val, fc, meta) {
     return (e?.provisional && e.actual != null) ? e.actual : null;
   });
 
-  /* ── Plugin: segment background shading ── */
+  /* ── Plugin: forecast region background shading ── */
   const segmentBgPlugin = {
     id: "segmentBg",
     beforeDraw(chart) {
@@ -981,39 +939,32 @@ function renderChart(val, fc, meta) {
       const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
       const px = idx => clamp(x.getPixelForValue(idx), left, right);
       ctx.save();
-      ctx.fillStyle = "rgba(77,148,255,0.032)";
-      ctx.fillRect(left, top, px(PRED_START_IDX - 0.5) - left, bottom - top);
       ctx.fillStyle = "rgba(245,158,11,0.042)";
       ctx.fillRect(px(LAST_DATA_IDX + 0.5), top, right - px(LAST_DATA_IDX + 0.5), bottom - top);
       ctx.restore();
     },
   };
 
-  /* ── Plugin: vertical annotation lines ── */
+  /* ── Plugin: "Last known data" annotation line ── */
   const vLinesPlugin = {
     id: "vLines",
     afterDraw(chart) {
       const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
-      [
-        { idx: PRED_START_IDX, label: "Prediction start", color: "rgba(245,158,11,0.65)" },
-        { idx: LAST_DATA_IDX,  label: "Last known data",  color: "rgba(226,232,242,0.40)" },
-      ].forEach(({ idx, label, color }) => {
-        const xp = x.getPixelForValue(idx);
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth   = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(xp, top);
-        ctx.lineTo(xp, bottom);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = color;
-        ctx.font      = "500 9.5px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(label, xp, top + 13);
-        ctx.restore();
-      });
+      const xp = x.getPixelForValue(LAST_DATA_IDX);
+      ctx.save();
+      ctx.strokeStyle = "rgba(226,232,242,0.40)";
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xp, top);
+      ctx.lineTo(xp, bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(226,232,242,0.40)";
+      ctx.font      = "500 9.5px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Last known data", xp, top + 13);
+      ctx.restore();
     },
   };
 
@@ -1098,135 +1049,6 @@ function renderChart(val, fc, meta) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MEDIUM PANEL
-═══════════════════════════════════════════════════════════ */
-async function loadAndRenderMedium() {
-  ["badge-med-r2", "badge-med-mae", "badge-med-rmse"].forEach(id => {
-    document.getElementById(id).textContent = "…";
-  });
-  try {
-    const [val, fc, metaFull] = await Promise.all([
-      loadJSON("outputs/medium_validation.json"),
-      loadJSON("outputs/medium_forecast.json"),
-      loadJSON("outputs/metadata.json"),
-    ]);
-    const meta = metaFull.medium || {};
-    document.getElementById("badge-med-r2").textContent   = fmt(meta.r2_trend,   3);
-    document.getElementById("badge-med-mae").textContent  = fmt(meta.mae_trend,  2);
-    document.getElementById("badge-med-rmse").textContent = fmt(meta.rmse_trend, 2);
-    renderMediumChart(val, fc);
-  } catch (err) {
-    console.error("Failed to load medium data:", err);
-    ["badge-med-r2", "badge-med-mae", "badge-med-rmse"].forEach(id => {
-      document.getElementById(id).textContent = "ERR";
-    });
-  }
-}
-
-function renderMediumChart(val, fc) {
-  if (mediumChartInstance) { mediumChartInstance.destroy(); mediumChartInstance = null; }
-
-  const LAST_VAL_IDX = val.length - 1;
-  const allLabels    = [
-    ...val.map(v => new Date(v.date + "T12:00:00Z")
-      .toLocaleDateString("en-GB", { day: "numeric", month: "short" })),
-    ...fc.map(f => new Date(f.date + "T12:00:00Z")
-      .toLocaleDateString("en-GB", { day: "numeric", month: "short" })),
-  ];
-  const N = allLabels.length;
-
-  const actualData  = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].actual ?? null) : null);
-  const valPredData = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].predicted_trend ?? null) : null);
-  const valHiData   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].upper_bound_trend ?? null) : null);
-  const valLoData   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].lower_bound_trend ?? null) : null);
-
-  const stitchVal  = val[LAST_VAL_IDX].actual ?? null;
-  const fcPredData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.predicted_trend   ?? null;
-    return null;
-  });
-  const fcHiData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.upper_bound_trend ?? null;
-    return null;
-  });
-  const fcLoData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.lower_bound_trend ?? null;
-    return null;
-  });
-
-  const segPlugin = {
-    id: "segBgMed",
-    beforeDraw(chart) {
-      const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
-      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-      const px = idx => clamp(x.getPixelForValue(idx), left, right);
-      ctx.save();
-      ctx.fillStyle = "rgba(245,158,11,0.042)";
-      ctx.fillRect(px(LAST_VAL_IDX + 0.5), top, right - px(LAST_VAL_IDX + 0.5), bottom - top);
-      ctx.restore();
-    },
-  };
-  const vLinePlugin = {
-    id: "vLineMed",
-    afterDraw(chart) {
-      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
-      const xp = x.getPixelForValue(LAST_VAL_IDX);
-      ctx.save();
-      ctx.strokeStyle = "rgba(226,232,242,0.40)";
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(226,232,242,0.40)";
-      ctx.font = "500 9.5px Inter, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("Last known data", xp, top + 13);
-      ctx.restore();
-    },
-  };
-
-  mediumChartInstance = new Chart(document.getElementById("chart-medium"), {
-    type: "line",
-    data: {
-      labels: allLabels,
-      datasets: [
-        { label: "Forecast band upper",   data: fcHiData,   borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.14)", pointRadius: 0, fill: "+1",   tension: 0.35, spanGaps: false },
-        { label: "Forecast band lower",   data: fcLoData,   borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false,  tension: 0.35, spanGaps: false },
-        { label: "Validation band upper", data: valHiData,  borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.08)", pointRadius: 0, fill: "+1",   tension: 0.35, spanGaps: false },
-        { label: "Validation band lower", data: valLoData,  borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false,  tension: 0.35, spanGaps: false },
-        { label: "Actual ISN",            data: actualData, borderColor: WHITE,          backgroundColor: "transparent",            borderWidth: 1.5,  pointRadius: 0, tension: 0.35, spanGaps: false },
-        { label: "Validation prediction", data: valPredData,borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 1.75, borderDash: [5, 3], pointRadius: 0, tension: 0.35, spanGaps: false },
-        { label: "12-Month Forecast",     data: fcPredData, borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 2.25, pointRadius: 0, tension: 0.35, spanGaps: false },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      interaction: { mode: "index", intersect: false },
-      layout: { padding: { top: 24, right: 4 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#111c2e", borderColor: "#253650", borderWidth: 1,
-          titleColor: WHITE, bodyColor: "#7a90ae", padding: 12, boxPadding: 5,
-          titleFont: { family: "Inter", size: 12, weight: "600" },
-          bodyFont:  { family: "Inter", size: 12 },
-          filter: item => !["Forecast band upper","Forecast band lower","Validation band upper","Validation band lower"].includes(item.dataset.label),
-        },
-      },
-      scales: {
-        x: { ticks: { color: TICK, font: { family: "Inter", size: 11 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 14 }, grid: { color: GRID }, border: { color: GRID } },
-        y: { ticks: { color: TICK, font: { family: "Inter", size: 11 } }, grid: { color: GRID }, border: { color: GRID },
-             title: { display: true, text: "Daily Sunspot Number (ISN)", color: TICK, font: { family: "Inter", size: 11, weight: "500" } } },
-      },
-    },
-    plugins: [segPlugin, vLinePlugin],
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
    LONG PANEL
 ═══════════════════════════════════════════════════════════ */
 async function loadAndRenderLong() {
@@ -1244,6 +1066,7 @@ async function loadAndRenderLong() {
     document.getElementById("badge-lng-mae").textContent  = fmt(meta.mae_point,  2);
     document.getElementById("badge-lng-rmse").textContent = fmt(meta.rmse_point, 2);
     renderLongChart(val, fc);
+    populateLongDetails(meta);
   } catch (err) {
     console.error("Failed to load long data:", err);
     ["badge-lng-r2", "badge-lng-mae", "badge-lng-rmse"].forEach(id => {
@@ -1353,6 +1176,34 @@ function renderLongChart(val, fc) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MODEL DESCRIPTION HELPERS
+═══════════════════════════════════════════════════════════ */
+function buildDetailRows(details) {
+  return details.map(d =>
+    `<div class="detail-row">
+       <span class="detail-key">${d.key}</span>
+       <span class="detail-val">${d.val}</span>
+     </div>`
+  ).join("");
+}
+
+function populateLongDetails(meta) {
+  const cfg      = meta.config || {};
+  const horizons = meta.horizons_trained || [];
+  const nSeeds   = meta.ensemble_size || 7;
+  const calW     = cfg.cal_window || 120;
+  const hRange   = horizons.length ? `+${horizons[0]} to +${horizons[horizons.length - 1]} months` : "";
+  const details  = [
+    { key: "Model",         val: "XGBoost Monthly Multi-Step Ensemble" },
+    { key: "Training data", val: `1818 to present · ${nSeeds}-seed ensemble · ${horizons.length} distinct horizons` },
+    { key: "Features",      val: "Monthly lags 1-132 months, rolling statistics up to 120 months, EMA, solar cycle + Gleissberg cycle encodings" },
+    { key: "Approach",      val: `Direct multi-step · ${nSeeds} seeds · ${hRange}` },
+    { key: "Uncertainty",   val: `Calibrated RMSE on trailing ${calW} months · 80% PI (1.28\u03c3)` },
+  ];
+  document.getElementById("model-detail-list-lng").innerHTML = buildDetailRows(details);
+}
+
+/* ═══════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════ */
 async function main() {
@@ -1361,7 +1212,6 @@ async function main() {
     MODEL_CONFIG[activeModelId].description;
   await Promise.all([
     loadAndRender(activeModelId),
-    loadAndRenderMedium(),
     loadAndRenderLong(),
   ]);
 }
