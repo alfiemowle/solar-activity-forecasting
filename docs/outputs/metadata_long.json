@@ -1,0 +1,52 @@
+{
+  "model_name": "xgboost_long_v2",
+  "data_granularity": "monthly",
+  "horizon_months": 144,
+  "validation_window_months": 144,
+  "horizons_trained": [
+    1,
+    6,
+    12,
+    24,
+    36,
+    48,
+    60,
+    72,
+    84,
+    96,
+    108,
+    120,
+    132,
+    144
+  ],
+  "ensemble_size": 7,
+  "r2_point": 0.485076,
+  "r2_trend": 0.251576,
+  "mae_point": 33.4504,
+  "rmse_point": 38.5461,
+  "mae_trend": 39.648,
+  "rmse_trend": 46.4711,
+  "uncertainty_method": "calibrated RMSE, 80pct PI (1.28 sigma)",
+  "config": {
+    "ensemble_seeds": [
+      42,
+      7,
+      123,
+      1,
+      2,
+      3,
+      99
+    ],
+    "cal_window": 120,
+    "xgb_params": {
+      "n_estimators": 500,
+      "max_depth": 4,
+      "learning_rate": 0.05,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 3,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.5
+    }
+  }
+}
