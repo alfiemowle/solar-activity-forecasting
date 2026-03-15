@@ -9,37 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ── Reset ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Tokens ────────────────────────────────────── */
     :root {
-      --bg:           #080d14;
-      --surface:      #0d1520;
-      --surface-hi:   #111c2e;
-      --border:       #192438;
-      --border-hi:    #253650;
-      --text-1:       #e2e8f2;
-      --text-2:       #7a90ae;
-      --text-3:       #3d5170;
-      --amber:        #f59e0b;
-      --amber-dim:    rgba(245,158,11,0.10);
-      --amber-glow:   rgba(245,158,11,0.06);
-      --blue:         #60a5fa;
-      --orange:       #f97316;
-      --grid:         #0f1928;
-      --tick:         #3d5170;
-      --radius:       14px;
-      --radius-sm:    9px;
+      --bg:        #080d14;
+      --surface:   #0d1520;
+      --surface-hi:#111c2e;
+      --border:    #192438;
+      --border-hi: #253650;
+      --text-1:    #e2e8f2;
+      --text-2:    #7a90ae;
+      --text-3:    #3d5170;
+      --amber:     #f59e0b;
+      --amber-dim: rgba(245,158,11,0.10);
+      --amber-glow:rgba(245,158,11,0.06);
+      --blue:      #60a5fa;
+      --orange:    #f97316;
+      --grid:      #0f1928;
+      --tick:      #3d5170;
+      --radius:    14px;
+      --radius-sm: 9px;
     }
 
-    /* ── Base ──────────────────────────────────────── */
     body {
       background: var(--bg);
-      background-image:
-        radial-gradient(ellipse 90% 40% at 50% 0%,
-          rgba(245,158,11,0.055) 0%,
-          transparent 65%);
+      background-image: radial-gradient(ellipse 90% 40% at 50% 0%, rgba(245,158,11,0.055) 0%, transparent 65%);
       color: var(--text-2);
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 14px;
@@ -49,21 +43,14 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Layout wrapper ────────────────────────────── */
-    .wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
 
-    /* ═══════════════════════════════════════════
-       HEADER
-    ═══════════════════════════════════════════ */
+    /* ── HEADER ── */
     .page-header {
       text-align: center;
       padding: 56px 0 48px;
       position: relative;
     }
-
     .header-overline {
       font-size: 0.68rem;
       font-weight: 500;
@@ -73,227 +60,144 @@
       opacity: 0.7;
       margin-bottom: 18px;
     }
-
     h1 {
       font-size: clamp(2.25rem, 5vw, 3.25rem);
       font-weight: 800;
       letter-spacing: -0.04em;
       line-height: 1.08;
-      /* Gradient: bright white → amber */
       background: linear-gradient(155deg, var(--text-1) 40%, #fbbf24 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       margin-bottom: 14px;
     }
-
     .page-subtitle {
       font-size: 0.875rem;
-      font-weight: 400;
       color: var(--text-3);
       letter-spacing: 0.02em;
-      margin-bottom: 28px;
     }
 
-    /* ── Model selector ────────────────────────── */
-    .model-selector-wrapper {
-      position: relative;
-      display: inline-block;
+    /* ── ACCORDION ── */
+    .model-accordion { margin: 36px 0 28px; }
+    .accordion-intro {
+      font-size: 0.875rem;
+      color: var(--text-2);
+      line-height: 1.75;
+      margin-bottom: 16px;
+      max-width: 700px;
     }
-
-    .model-pill-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
+    .accordion-item {
       background: var(--surface);
-      border: 1px solid var(--border-hi);
-      border-radius: 100px;
-      padding: 10px 18px 10px 14px;
-      color: var(--amber);
-      font-family: inherit;
-      font-size: 0.83rem;
-      font-weight: 600;
-      letter-spacing: 0.01em;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .accordion-item.open { border-color: var(--border-hi); }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 18px;
       cursor: pointer;
       user-select: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: background 0.15s;
     }
-    .model-pill-btn:hover {
-      background: var(--surface-hi);
-      border-color: rgba(245,158,11,0.5);
-      box-shadow: 0 0 0 4px var(--amber-glow), 0 4px 16px rgba(0,0,0,0.5);
-    }
-    .pill-dot {
-      width: 7px;
-      height: 7px;
+    .accordion-header:hover { background: var(--surface-hi); }
+    .acc-dot {
+      width: 8px; height: 8px;
       border-radius: 50%;
-      background: var(--amber);
       flex-shrink: 0;
-      box-shadow: 0 0 6px rgba(245,158,11,0.6);
     }
-    .pill-arrow {
-      font-size: 0.58rem;
-      color: var(--amber);
-      opacity: 0.55;
-      transition: transform 0.2s;
-      margin-left: 1px;
-    }
-    .model-pill-btn.open .pill-arrow { transform: rotate(180deg); }
-
-    .model-dropdown {
-      position: absolute;
-      top: calc(100% + 7px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface-hi);
-      border: 1px solid var(--border-hi);
-      border-radius: var(--radius);
-      padding: 5px;
-      min-width: 230px;
-      z-index: 200;
-      display: none;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03),
-        0 20px 56px rgba(0,0,0,0.65);
-    }
-    .model-dropdown.open { display: block; }
-
-    .model-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 13px;
-      border-radius: 9px;
-      cursor: pointer;
-      font-size: 0.83rem;
-      color: var(--text-2);
-      transition: background 0.12s, color 0.12s;
-    }
-    .model-option:hover:not(.model-option-locked) {
-      background: rgba(255,255,255,0.04);
+    .acc-name {
+      font-size: 0.875rem;
+      font-weight: 600;
       color: var(--text-1);
+      min-width: 110px;
     }
-    .model-option.model-option-active {
-      color: var(--amber);
-      background: var(--amber-dim);
-    }
-    .model-option.model-option-locked {
-      color: var(--text-3);
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-    .opt-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: currentColor;
-    }
-    .opt-coming-soon {
+    .acc-metrics {
+      display: flex;
       margin-left: auto;
-      font-size: 0.63rem;
-      font-weight: 500;
-      color: var(--text-3);
-      background: rgba(255,255,255,0.03);
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 2px 7px;
-      letter-spacing: 0.04em;
-    }
-
-    /* ═══════════════════════════════════════════
-       MODEL DESCRIPTION CARD
-    ═══════════════════════════════════════════ */
-    .model-desc-card {
-      position: relative;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px 20px 28px;
-      margin-bottom: 18px;
+      border-radius: 6px;
       overflow: hidden;
     }
-    .model-desc-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 14px;
-      bottom: 14px;
-      width: 2px;
-      background: linear-gradient(
-        to bottom,
-        transparent,
-        rgba(245,158,11,0.55),
-        transparent
-      );
-      border-radius: 0 1px 1px 0;
+    .acc-mc {
+      padding: 5px 14px;
+      text-align: center;
     }
-    .model-desc-eyebrow {
-      font-size: 0.65rem;
+    .acc-mc + .acc-mc { border-left: 1px solid var(--border); }
+    .acc-ml {
+      display: block;
+      font-size: 0.57rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--text-3);
-      margin-bottom: 7px;
     }
-    #model-desc-text {
-      font-size: 0.855rem;
+    .acc-mv {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .acc-chevron {
+      font-size: 0.65rem;
+      color: var(--text-3);
+      margin-left: 8px;
+      flex-shrink: 0;
+      transition: transform 0.22s;
+    }
+    .accordion-item.open .acc-chevron { transform: rotate(180deg); }
+    .accordion-body { display: none; padding: 0 18px 18px; }
+    .accordion-item.open .accordion-body { display: block; }
+    .acc-desc {
+      font-size: 0.845rem;
       color: var(--text-2);
       line-height: 1.78;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .acc-sub-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 8px;
+    }
+    .acc-long-metrics {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
     }
 
-    /* ═══════════════════════════════════════════
-       PANELS
-    ═══════════════════════════════════════════ */
-    .panels-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
+    /* ── PANELS ── */
+    .panels-stack { display: flex; flex-direction: column; gap: 16px; }
     .panel-card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-hi);
       border-radius: var(--radius);
       padding: 24px 26px;
-      position: relative;
+      box-shadow: inset 0 1px 0 rgba(245,158,11,0.18);
     }
-
-    /* Active panel: amber top shimmer */
-    .panel-card--active {
-      box-shadow: inset 0 1px 0 rgba(245,158,11,0.28);
-      border-color: var(--border-hi);
-    }
-
-    /* Locked panel: subdued */
-    .panel-card--locked {
-      opacity: 0.6;
-    }
-
-    /* ── Panel header ──────────────────────────── */
     .panel-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 22px;
-    }
-
-    .panel-title-group {
-      display: flex;
-      align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
-
     .panel-title {
       font-size: 0.975rem;
       font-weight: 700;
       color: var(--text-1);
       letter-spacing: -0.01em;
     }
-
     .panel-period-tag {
       font-size: 0.7rem;
       font-weight: 500;
@@ -302,63 +206,9 @@
       border: 1px solid var(--border);
       border-radius: 100px;
       padding: 2px 10px;
-      letter-spacing: 0.03em;
     }
 
-    .panel-lock-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.68rem;
-      font-weight: 500;
-      color: var(--text-3);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 3px 10px;
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Metrics cluster ───────────────────────── */
-    .metrics-cluster {
-      display: flex;
-      align-items: stretch;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-    .metric-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 18px;
-      gap: 3px;
-      min-width: 72px;
-    }
-    .metric-lbl {
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-3);
-    }
-    .metric-num {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--blue);
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-    }
-    .metric-num--dim { color: var(--border-hi); }
-    .metric-sep {
-      width: 1px;
-      background: var(--border);
-      margin: 6px 0;
-      flex-shrink: 0;
-    }
-
-    /* ── Chart legend ──────────────────────────── */
+    /* ── LEGEND ── */
     .chart-legend {
       display: flex;
       flex-wrap: wrap;
@@ -373,108 +223,27 @@
       gap: 7px;
       font-size: 0.73rem;
       color: var(--text-3);
-      letter-spacing: 0.01em;
     }
-    .lg-swatch {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-    }
-    .lg-swatch::before { content: ''; display: block; }
-
-    .lg-swatch--solid-white::before {
-      width: 22px; height: 2px;
-      background: var(--text-1);
-      border-radius: 1px;
-    }
-    .lg-swatch--dash-amber::before {
-      width: 22px; height: 2px;
-      background: repeating-linear-gradient(
-        90deg,
-        var(--amber) 0, var(--amber) 5px,
-        transparent 5px, transparent 9px
-      );
-    }
-    .lg-swatch--solid-amber::before {
+    .lg-line {
+      display: inline-block;
       width: 22px; height: 2.5px;
-      background: var(--amber);
       border-radius: 1px;
+      vertical-align: middle;
+      flex-shrink: 0;
     }
-    .lg-swatch--dot-orange::before {
+    .lg-dot {
+      display: inline-block;
       width: 8px; height: 8px;
       border-radius: 50%;
       background: var(--orange);
-    }
-
-    /* ── Chart wrapper ─────────────────────────── */
-    .chart-wrapper {
-      position: relative;
-      height: 380px;
-    }
-
-    /* ── Detail list ───────────────────────────── */
-    .detail-list {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
-    }
-    .detail-row {
-      display: flex;
-      align-items: baseline;
-      gap: 20px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.02);
-    }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-key {
-      flex: 0 0 120px;
-      font-size: 0.66rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--text-3);
-      padding-top: 1px;
-    }
-    .detail-val {
-      font-size: 0.8rem;
-      color: var(--text-2);
-      line-height: 1.5;
-    }
-
-    /* ── Locked body ───────────────────────────── */
-    .locked-body {
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-      padding: 20px 4px 28px;
-    }
-    .locked-icon {
+      vertical-align: middle;
       flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 9px;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-3);
-      margin-top: 2px;
-    }
-    .locked-icon svg {
-      width: 15px;
-      height: 15px;
-    }
-    .locked-desc {
-      font-size: 0.845rem;
-      color: var(--text-3);
-      line-height: 1.72;
-      max-width: 560px;
     }
 
-    /* ═══════════════════════════════════════════
-       FOOTER
-    ═══════════════════════════════════════════ */
+    /* ── CHART ── */
+    .chart-wrapper { position: relative; height: 380px; }
+
+    /* ── FOOTER ── */
     .page-footer {
       display: flex;
       justify-content: space-between;
@@ -485,85 +254,63 @@
       border-top: 1px solid var(--border);
       font-size: 0.72rem;
       color: var(--text-3);
-      letter-spacing: 0.01em;
     }
   </style>
-<style>
-  /* ── Site nav (injected) ─────────────────────────────────── */
-  .site-nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    height: 52px;
-    background: rgba(8,13,20,0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid #192438;
-    margin: 0 -20px;
-  }
-  .site-nav .nav-brand {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #f59e0b;
-    letter-spacing: -0.01em;
-    text-decoration: none;
-  }
-  .site-nav .nav-links {
-    display: flex;
-    gap: 28px;
-    list-style: none;
-  }
-  .site-nav .nav-links a {
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: #7a90ae;
-    letter-spacing: 0.01em;
-    text-decoration: none;
-    transition: color 0.18s;
-  }
-  .site-nav .nav-links a:hover { color: #e2e8f2; }
-  .site-nav .nav-links a.nav-active { color: #f59e0b; }
+  <style>
+    /* ── Site nav ── */
+    .site-nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 52px;
+      background: rgba(8,13,20,0.92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid #192438;
+      margin: 0 -20px;
+    }
+    .site-nav .nav-brand {
+      font-size: 0.88rem; font-weight: 700;
+      color: #f59e0b; letter-spacing: -0.01em; text-decoration: none;
+    }
+    .site-nav .nav-links { display: flex; gap: 28px; list-style: none; }
+    .site-nav .nav-links a {
+      font-size: 0.78rem; font-weight: 500; color: #7a90ae;
+      letter-spacing: 0.01em; text-decoration: none; transition: color 0.18s;
+    }
+    .site-nav .nav-links a:hover { color: #e2e8f2; }
+    .site-nav .nav-links a.nav-active { color: #f59e0b; }
 
-  /* ── Pixel art & starfield ──────────────────── */
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.12; }
-    50%       { opacity: 0.85; }
-  }
-  @keyframes pixel-pulse {
-    0%, 100% { filter: brightness(1); }
-    50%       { filter: brightness(1.35); }
-  }
-  @keyframes satellite-drift {
-    0%, 100% { transform: translate(0,0) rotate(0deg); }
-    50%       { transform: translate(2px,-1px) rotate(4deg); }
-  }
-  .star {
-    position: absolute;
-    background: #e2e8f2;
-    image-rendering: pixelated;
-    animation: twinkle var(--dur,3s) ease-in-out var(--dly,0s) infinite;
-    pointer-events: none;
-  }
-  .pixel-sun {
-    display: block;
-    margin: 0 auto 22px;
-    image-rendering: pixelated;
-    animation: pixel-pulse 5s ease-in-out infinite;
-  }
-  .nav-satellite {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 5px;
-    image-rendering: pixelated;
-    animation: satellite-drift 8s ease-in-out infinite;
-  }
-</style>
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.12; }
+      50%       { opacity: 0.85; }
+    }
+    @keyframes pixel-pulse {
+      0%, 100% { filter: brightness(1); }
+      50%       { filter: brightness(1.35); }
+    }
+    @keyframes satellite-drift {
+      0%, 100% { transform: translate(0,0) rotate(0deg); }
+      50%       { transform: translate(2px,-1px) rotate(4deg); }
+    }
+    .star {
+      position: absolute; background: #e2e8f2;
+      image-rendering: pixelated;
+      animation: twinkle var(--dur,3s) ease-in-out var(--dly,0s) infinite;
+      pointer-events: none;
+    }
+    .pixel-sun {
+      display: block; margin: 0 auto 22px;
+      image-rendering: pixelated;
+      animation: pixel-pulse 5s ease-in-out infinite;
+    }
+    .nav-satellite {
+      display: inline-block; vertical-align: middle; margin-right: 5px;
+      image-rendering: pixelated;
+      animation: satellite-drift 8s ease-in-out infinite;
+    }
+  </style>
 </head>
 <body>
+
 <nav class="site-nav">
   <a href="./home/index.html" class="nav-brand">
     <svg class="nav-satellite" width="20" height="10" viewBox="0 0 20 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -581,11 +328,10 @@
     <li><a href="./about/index.html">About</a></li>
   </ul>
 </nav>
+
 <div class="wrap">
 
-<!-- ═══════════ HEADER ═══════════ -->
 <header class="page-header">
-  <!-- Twinkling pixel stars -->
   <span class="star" style="width:2px;height:2px;top:10%;left:5%;--dur:2.8s;--dly:0s;"></span>
   <span class="star" style="width:1px;height:1px;top:22%;left:11%;--dur:3.5s;--dly:0.4s;"></span>
   <span class="star" style="width:2px;height:2px;top:55%;left:4%;--dur:2.1s;--dly:1.2s;"></span>
@@ -597,7 +343,6 @@
   <span class="star" style="width:2px;height:2px;top:80%;right:4%;--dur:3.1s;--dly:0.9s;"></span>
   <span class="star" style="width:1px;height:1px;top:30%;right:13%;--dur:4.2s;--dly:0.3s;"></span>
 
-  <!-- Pixel art sun -->
   <svg class="pixel-sun" width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <g fill="#f59e0b">
       <rect x="21" y="0"  width="6" height="12"/>
@@ -622,107 +367,45 @@
   <p class="header-overline">Real-time solar monitoring</p>
   <h1>Solar Activity<br>Forecast</h1>
   <p class="page-subtitle">Daily International Sunspot Number</p>
-
-  <div class="model-selector-wrapper" id="model-selector-wrapper">
-    <button class="model-pill-btn" id="model-pill-btn"
-            aria-haspopup="listbox" aria-expanded="false">
-      <span class="pill-dot" id="pill-dot"></span>
-      <span id="pill-label">XGBoost</span>
-      <span class="pill-arrow">▾</span>
-    </button>
-    <div class="model-dropdown" id="model-dropdown" role="listbox">
-      <!-- injected by JS -->
-    </div>
-  </div>
 </header>
 
-<!-- ═══════════ MODEL DESCRIPTION ═══════════ -->
-<div class="model-desc-card" id="model-desc-card">
-  <p class="model-desc-eyebrow">Architecture Overview</p>
-  <p id="model-desc-text">Loading…</p>
-</div>
+<!-- ═══════════ MODEL ACCORDION ═══════════ -->
+<section class="model-accordion" id="model-accordion">
+  <p class="accordion-intro">
+    These forecasts are generated by machine learning models trained on the
+    SILSO International Sunspot Number record. Both charts below show all
+    trained models simultaneously. Hover a line to highlight it and reveal
+    its confidence band. Click any model to read more about how it works.
+  </p>
+  <!-- items injected by JS -->
+</section>
 
 <!-- ═══════════ PANELS ═══════════ -->
 <div class="panels-stack">
 
-  <!-- Panel 1 — Short Term (active) -->
-  <section class="panel-card panel-card--active" id="panel-short">
+  <section class="panel-card" id="panel-short">
     <div class="panel-header">
-      <div class="panel-title-group">
-        <h2 class="panel-title">Short Term Forecast</h2>
-        <span class="panel-period-tag">30 Days</span>
-      </div>
-      <div class="metrics-cluster">
-        <div class="metric-cell">
-          <span class="metric-lbl">R²</span>
-          <span class="metric-num" id="badge-r2">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">MAE</span>
-          <span class="metric-num" id="badge-mae">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">RMSE</span>
-          <span class="metric-num" id="badge-rmse">—</span>
-        </div>
-      </div>
+      <h2 class="panel-title">Short Term Forecast</h2>
+      <span class="panel-period-tag">30 Days</span>
     </div>
-
-    <!-- HTML legend (Chart.js built-in legend disabled) -->
-    <div class="chart-legend">
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-white"></span>Actual ISN</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--dash-amber"></span>Validation prediction</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-amber"></span>30-Day Forecast</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--dot-orange"></span>Provisional reading</span>
-    </div>
-
+    <div class="chart-legend" id="legend-short"></div>
     <div class="chart-wrapper">
       <canvas id="chart-main"></canvas>
     </div>
-
-    <div class="detail-list" id="model-detail-list">
-      <!-- injected by JS -->
-    </div>
   </section>
 
-  <!-- Panel 2 — Long Term -->
-  <section class="panel-card panel-card--active" id="panel-long">
+  <section class="panel-card" id="panel-long">
     <div class="panel-header">
-      <div class="panel-title-group">
-        <h2 class="panel-title">Long Term Forecast</h2>
-        <span class="panel-period-tag">12 Years</span>
-      </div>
-      <div class="metrics-cluster">
-        <div class="metric-cell">
-          <span class="metric-lbl">R²</span>
-          <span class="metric-num" id="badge-lng-r2">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">MAE</span>
-          <span class="metric-num" id="badge-lng-mae">—</span>
-        </div>
-        <div class="metric-sep"></div>
-        <div class="metric-cell">
-          <span class="metric-lbl">RMSE</span>
-          <span class="metric-num" id="badge-lng-rmse">—</span>
-        </div>
-      </div>
+      <h2 class="panel-title">Long Term Forecast</h2>
+      <span class="panel-period-tag">12 Years</span>
     </div>
-    <div class="chart-legend">
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-white"></span>Monthly ISN</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--dash-amber"></span>Validation prediction</span>
-      <span class="lg-item"><span class="lg-swatch lg-swatch--solid-amber"></span>12-Year Forecast</span>
-    </div>
+    <div class="chart-legend" id="legend-long"></div>
     <div class="chart-wrapper">
       <canvas id="chart-long"></canvas>
     </div>
-    <div class="detail-list" id="model-detail-list-lng"></div>
   </section>
 
-</div><!-- /panels-stack -->
+</div>
 
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer class="page-footer">
@@ -734,22 +417,12 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   MODEL CONFIGURATION
-   Add new architectures here. Set available: true to unlock.
-   paths are relative to solar_forecast/website/.
+   MODEL CONFIG
 ═══════════════════════════════════════════════════════════ */
 const MODEL_CONFIG = {
   xgboost: {
-    id:        "xgboost",
-    label:     "XGBoost",
-    available: true,
-    description:
-      "XGBoost (Extreme Gradient Boosting) is a tree-based ensemble method that builds " +
-      "models sequentially, each correcting errors of the previous. For solar forecasting " +
-      "it uses a direct multi-step strategy — separate ensembles trained independently for " +
-      "each forecast horizon, avoiding compounding errors from autoregressive chaining. " +
-      "Three models per horizon are trained with different random seeds and their predictions " +
-      "averaged for robustness.",
+    id: "xgboost", label: "XGBoost", available: true,
+    description: "XGBoost (Extreme Gradient Boosting) is a tree-based ensemble method that builds models sequentially, each correcting errors of the previous. For solar forecasting it uses a direct multi-step strategy — separate ensembles trained independently for each forecast horizon, avoiding compounding errors from autoregressive chaining. Three models per horizon are trained with different random seeds and their predictions averaged for robustness.",
     paths: {
       validation:      "outputs/xgboost_validation.json",
       forecast:        "outputs/xgboost_forecast.json",
@@ -757,31 +430,10 @@ const MODEL_CONFIG = {
       long_validation: "outputs/xgboost_long_validation.json",
       long_forecast:   "outputs/xgboost_long_forecast.json",
     },
-    details: [
-      { key: "Model",         val: "XGBoost Daily Multi-Step Ensemble" },
-      { key: "Training data", val: "1818 to present · 76,030 daily observations" },
-      { key: "Features",      val: "30+ causal features including Carrington rotation lags, EMAs, rolling statistics, solar cycle encodings" },
-      { key: "Approach",      val: "Direct multi-step · 3 seeds · horizons +1 +2 +3 +4 +5 +6 +7 +10 +14 +18 +21 +25 +28 +30 days" },
-      { key: "Uncertainty",   val: "Calibrated from 730-day held-out window" },
-    ],
-  },
-  rf: {
-    id:        "rf",
-    label:     "Random Forest",
-    available: false,
-    description: "Random Forest is an ensemble method that builds multiple decision trees independently and averages their predictions. Each tree is trained on a random subset of data and features, providing natural variance estimates for uncertainty quantification.",
-    paths: {
-      validation: "outputs/rf/validation.json",
-      forecast:   "outputs/rf/forecast.json",
-      metadata:   "outputs/rf/metadata.json",
-    },
-    details: [],
   },
   lstm: {
-    id:        "lstm",
-    label:     "LSTM",
-    available: true,
-    description: "Long Short-Term Memory (LSTM) networks are recurrent neural networks designed to learn long-range temporal dependencies. For solar forecasting they capture multi-year solar cycle patterns alongside short-term variability without manual feature engineering.",
+    id: "lstm", label: "LSTM", available: true,
+    description: "Long Short-Term Memory (LSTM) networks are recurrent neural networks designed to learn long-range temporal dependencies. Unlike tree-based methods, they process the ISN as a raw sequence, learning the 27-day solar rotation period, cycle rise and fall trajectories, and multi-year trends directly from the data without hand-crafted features. The model uses a 5-seed ensemble with attention mechanism for the short-term pipeline.",
     paths: {
       validation:      "outputs/lstm/validation.json",
       forecast:        "outputs/lstm/forecast.json",
@@ -789,49 +441,45 @@ const MODEL_CONFIG = {
       long_validation: "outputs/lstm/long_validation.json",
       long_forecast:   "outputs/lstm/long_forecast.json",
     },
-    details: [],
+  },
+  rf: {
+    id: "rf", label: "Random Forest", available: false,
+    description: "Random Forest builds multiple decision trees on random subsets of data and features, averaging their predictions. Coming soon.",
+    paths: {},
   },
   transformer: {
-    id:        "transformer",
-    label:     "Transformer",
-    available: false,
-    description: "Transformer models use self-attention mechanisms to model dependencies across the full input sequence without recurrence. For time series forecasting they capture complex seasonal and cyclical patterns at multiple temporal scales simultaneously.",
-    paths: {
-      validation: "outputs/transformer/validation.json",
-      forecast:   "outputs/transformer/forecast.json",
-      metadata:   "outputs/transformer/metadata.json",
-    },
-    details: [],
+    id: "transformer", label: "Transformer", available: false,
+    description: "Transformer models use self-attention to model dependencies across the full input sequence. Coming soon.",
+    paths: {},
   },
 };
 
 /* ═══════════════════════════════════════════════════════════
-   STATE
+   MODEL COLOURS  (line / confidence band / dimmed)
 ═══════════════════════════════════════════════════════════ */
-let activeModelId = "xgboost";
-let chartInstance       = null;
-let longChartInstance = null;
+const MODEL_COLORS = {
+  xgboost:     { line: "#f59e0b", band: "rgba(245,158,11,0.13)",  dim: "rgba(245,158,11,0.25)" },
+  lstm:        { line: "#60a5fa", band: "rgba(96,165,250,0.13)",   dim: "rgba(96,165,250,0.25)" },
+  rf:          { line: "#4ade80", band: "rgba(74,222,128,0.13)",   dim: "rgba(74,222,128,0.25)" },
+  transformer: { line: "#c084fc", band: "rgba(192,132,252,0.13)",  dim: "rgba(192,132,252,0.25)" },
+};
 
-/* ═══════════════════════════════════════════════════════════
-   CHART COLOUR PALETTE
-═══════════════════════════════════════════════════════════ */
-const AMBER = "#f59e0b";
 const WHITE = "#e2e8f2";
 const GRID  = "#0f1928";
 const TICK  = "#3d5170";
 
+let shortChartInstance = null;
+let longChartInstance  = null;
+
 /* ═══════════════════════════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════════════════════════ */
-function fmt(v, dp = 2) {
-  return v == null ? "—" : Number(v).toFixed(dp);
-}
+function fmt(v, dp = 2) { return v == null ? "—" : Number(v).toFixed(dp); }
 
 function fmtDate(iso) {
   return new Date(iso + "T12:00:00Z")
     .toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
-
 function fmtDateLong(iso) {
   return new Date(iso + "T12:00:00Z")
     .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
@@ -839,7 +487,7 @@ function fmtDateLong(iso) {
 
 async function loadJSON(path) {
   const r = await fetch(path);
-  if (!r.ok) throw new Error(`Failed to load ${path} (${r.status})`);
+  if (!r.ok) throw new Error(`${path} (${r.status})`);
   return r.json();
 }
 
@@ -852,386 +500,271 @@ function makeDateRange(startDate, days) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DROPDOWN
+   LOAD ALL AVAILABLE MODELS
 ═══════════════════════════════════════════════════════════ */
-function initDropdown() {
-  const dd  = document.getElementById("model-dropdown");
-  const btn = document.getElementById("model-pill-btn");
-
-  Object.values(MODEL_CONFIG).forEach(cfg => {
-    const opt = document.createElement("div");
-    opt.className = "model-option" +
-      (cfg.id === activeModelId ? " model-option-active" : "") +
-      (!cfg.available            ? " model-option-locked" : "");
-    opt.setAttribute("role", "option");
-    opt.dataset.modelId = cfg.id;
-    opt.innerHTML =
-      `<span class="opt-dot"></span>` +
-      `<span>${cfg.label}</span>` +
-      (!cfg.available
-        ? `<span class="opt-coming-soon">Coming Soon</span>`
-        : "");
-
-    if (cfg.available) {
-      opt.addEventListener("click", () => { selectModel(cfg.id); closeDropdown(); });
+async function loadAllModels() {
+  const available = Object.values(MODEL_CONFIG).filter(c => c.available);
+  const results = await Promise.all(available.map(async cfg => {
+    try {
+      const [val, fc, meta] = await Promise.all([
+        loadJSON(cfg.paths.validation),
+        loadJSON(cfg.paths.forecast),
+        loadJSON(cfg.paths.metadata),
+      ]);
+      let longVal = null, longFc = null;
+      if (cfg.paths.long_validation) {
+        try {
+          [longVal, longFc] = await Promise.all([
+            loadJSON(cfg.paths.long_validation),
+            loadJSON(cfg.paths.long_forecast),
+          ]);
+        } catch(e) { console.warn(`No long data for ${cfg.id}`); }
+      }
+      return { cfg, val, fc, meta, longVal, longFc };
+    } catch(e) {
+      console.error(`Failed to load ${cfg.id}:`, e);
+      return null;
     }
-    dd.appendChild(opt);
-  });
-
-  btn.addEventListener("click", () => {
-    dd.classList.contains("open") ? closeDropdown() : openDropdown();
-  });
-  document.addEventListener("click", e => {
-    if (!document.getElementById("model-selector-wrapper").contains(e.target)) {
-      closeDropdown();
-    }
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") closeDropdown();
-  });
-}
-
-function openDropdown() {
-  document.getElementById("model-dropdown").classList.add("open");
-  document.getElementById("model-pill-btn").classList.add("open");
-  document.getElementById("model-pill-btn").setAttribute("aria-expanded", "true");
-}
-
-function closeDropdown() {
-  document.getElementById("model-dropdown").classList.remove("open");
-  document.getElementById("model-pill-btn").classList.remove("open");
-  document.getElementById("model-pill-btn").setAttribute("aria-expanded", "false");
+  }));
+  return results.filter(Boolean);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MODEL SELECTION
+   BUILD ACCORDION
 ═══════════════════════════════════════════════════════════ */
-async function selectModel(modelId) {
-  if (modelId === activeModelId) return;
-  activeModelId = modelId;
-  const cfg = MODEL_CONFIG[modelId];
-  document.getElementById("pill-label").textContent = cfg.label;
-  document.querySelectorAll(".model-option").forEach(opt => {
-    opt.classList.toggle("model-option-active", opt.dataset.modelId === modelId);
+function buildAccordion(modelsData) {
+  const container = document.getElementById("model-accordion");
+  container.querySelectorAll(".accordion-item").forEach(el => el.remove());
+
+  modelsData.forEach(({ cfg, meta }) => {
+    const c = MODEL_COLORS[cfg.id];
+
+    // Short metrics
+    const r2   = fmt(meta.r2_point,   3);
+    const mae  = fmt(meta.mae_point,  2);
+    const rmse = fmt(meta.rmse_point, 2);
+
+    // Long metrics
+    let longHtml = "";
+    if (meta.long) {
+      const lr2   = fmt(meta.long.r2_point,   3);
+      const lmae  = fmt(meta.long.mae_point,  2);
+      const lrmse = fmt(meta.long.rmse_point, 2);
+      longHtml = `
+        <p class="acc-sub-label" style="margin-top:14px">12-Year Pipeline</p>
+        <div class="acc-long-metrics">
+          <div class="acc-mc">
+            <span class="acc-ml">R2</span>
+            <span class="acc-mv" style="color:${c.line}">${lr2}</span>
+          </div>
+          <div class="acc-mc" style="border-left:1px solid var(--border)">
+            <span class="acc-ml">MAE</span>
+            <span class="acc-mv" style="color:${c.line}">${lmae}</span>
+          </div>
+          <div class="acc-mc" style="border-left:1px solid var(--border)">
+            <span class="acc-ml">RMSE</span>
+            <span class="acc-mv" style="color:${c.line}">${lrmse}</span>
+          </div>
+        </div>`;
+    }
+
+    const item = document.createElement("div");
+    item.className = "accordion-item";
+    item.innerHTML = `
+      <div class="accordion-header">
+        <span class="acc-dot" style="background:${c.line};box-shadow:0 0 6px ${c.line}99"></span>
+        <span class="acc-name">${cfg.label}</span>
+        <div class="acc-metrics">
+          <div class="acc-mc">
+            <span class="acc-ml">30d R2</span>
+            <span class="acc-mv" style="color:${c.line}">${r2}</span>
+          </div>
+          <div class="acc-mc">
+            <span class="acc-ml">MAE</span>
+            <span class="acc-mv" style="color:${c.line}">${mae}</span>
+          </div>
+          <div class="acc-mc">
+            <span class="acc-ml">RMSE</span>
+            <span class="acc-mv" style="color:${c.line}">${rmse}</span>
+          </div>
+        </div>
+        <span class="acc-chevron">&#9660;</span>
+      </div>
+      <div class="accordion-body">
+        <p class="acc-desc">${cfg.description}</p>
+        ${longHtml}
+      </div>`;
+
+    item.querySelector(".accordion-header")
+      .addEventListener("click", () => item.classList.toggle("open"));
+
+    container.appendChild(item);
   });
-  await Promise.all([loadAndRender(modelId), loadAndRenderLong()]);
-}
 
-/* ═══════════════════════════════════════════════════════════
-   DATA LOADING & UI UPDATE
-═══════════════════════════════════════════════════════════ */
-async function loadAndRender(modelId) {
-  const cfg = MODEL_CONFIG[modelId];
-
-  ["badge-r2", "badge-mae", "badge-rmse"].forEach(id => {
-    document.getElementById(id).textContent = "…";
-  });
-  document.getElementById("model-desc-text").textContent = cfg.description;
-
-  try {
-    const [val, fc, meta] = await Promise.all([
-      loadJSON(cfg.paths.validation),
-      loadJSON(cfg.paths.forecast),
-      loadJSON(cfg.paths.metadata),
-    ]);
-
-    document.getElementById("badge-r2").textContent   = fmt(meta.r2_point,   3);
-    document.getElementById("badge-mae").textContent  = fmt(meta.mae_point,  2);
-    document.getElementById("badge-rmse").textContent = fmt(meta.rmse_point, 2);
-
+  // Footer date
+  const dates = modelsData.map(m => m.meta.date_generated).filter(Boolean).sort();
+  if (dates.length) {
     document.getElementById("footer-right").textContent =
-      `Generated ${fmtDateLong(meta.date_generated.slice(0, 10))} · ` +
-      `Data current to ${fmtDateLong(meta.last_data_date)}`;
-
-    updateDetailList(cfg);
-    renderChart(val, fc, meta);
-
-  } catch (err) {
-    console.error("Failed to load model data:", err);
-    ["badge-r2", "badge-mae", "badge-rmse"].forEach(id => {
-      document.getElementById(id).textContent = "ERR";
-    });
+      `Generated ${fmtDateLong(dates[dates.length - 1].slice(0, 10))}`;
   }
 }
 
-function updateDetailList(cfg) {
-  const list = document.getElementById("model-detail-list");
-  if (!cfg.details.length) { list.innerHTML = ""; return; }
-  list.innerHTML = cfg.details.map(d =>
-    `<div class="detail-row">
-       <span class="detail-key">${d.key}</span>
-       <span class="detail-val">${d.val}</span>
-     </div>`
-  ).join("");
+/* ═══════════════════════════════════════════════════════════
+   BUILD LEGEND
+═══════════════════════════════════════════════════════════ */
+function buildLegend(modelsData, containerId) {
+  const isLong = containerId === "legend-long";
+  let html = `<span class="lg-item"><span class="lg-line" style="background:${WHITE}"></span>${isLong ? "Monthly ISN" : "Actual ISN"}</span>`;
+  modelsData.forEach(({ cfg }) => {
+    const col = MODEL_COLORS[cfg.id].line;
+    html += `<span class="lg-item"><span class="lg-line" style="background:${col}"></span>${cfg.label}</span>`;
+  });
+  if (!isLong) {
+    html += `<span class="lg-item"><span class="lg-dot"></span>Provisional</span>`;
+  }
+  document.getElementById(containerId).innerHTML = html;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   CHART
+   HOVER: dim other models, show band for hovered model
 ═══════════════════════════════════════════════════════════ */
-function renderChart(val, fc, meta) {
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+function applyHoverState(chart, hoveredModelId) {
+  chart.data.datasets.forEach(ds => {
+    const mid  = ds._modelId;
+    const type = ds._type;
+    if (!mid || type === "actual" || type === "provisional") return;
+    const c       = MODEL_COLORS[mid];
+    const noHover = hoveredModelId === null;
+    const isMe    = mid === hoveredModelId;
+    if (type === "band-upper") {
+      ds.backgroundColor = isMe ? c.band : "transparent";
+    } else if (type === "val" || type === "fc") {
+      ds.borderColor = (noHover || isMe) ? c.line : c.dim;
+      ds.borderWidth = isMe ? 2.5 : (noHover ? 2 : 1.5);
+    }
+  });
+}
 
-  const lastDataDate = meta.last_data_date;
+function attachHover(chart) {
+  const canvas = chart.canvas;
+  let lastModel = null;
 
-  /* ── Date ranges ── */
-  const ldDate = new Date(lastDataDate + "T12:00:00Z");
+  function nearest(e) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    let best = null, bestD = 40;
+    chart.data.datasets.forEach((ds, i) => {
+      if (ds._type !== "fc" && ds._type !== "val") return;
+      chart.getDatasetMeta(i).data.forEach(pt => {
+        if (isNaN(pt.x) || isNaN(pt.y)) return;
+        const d = Math.sqrt((pt.x - mx) ** 2 + (pt.y - my) ** 2);
+        if (d < bestD) { bestD = d; best = ds._modelId; }
+      });
+    });
+    return best;
+  }
 
-  // Validation window: LAST_DATA_DATE-29 to LAST_DATA_DATE (30 days)
-  const seg2Start = new Date(ldDate);
+  canvas.addEventListener("mousemove", e => {
+    const m = nearest(e);
+    if (m !== lastModel) {
+      lastModel = m;
+      applyHoverState(chart, m);
+      chart.update("none");
+    }
+  });
+  canvas.addEventListener("mouseleave", () => {
+    if (lastModel !== null) {
+      lastModel = null;
+      applyHoverState(chart, null);
+      chart.update("none");
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SHORT CHART
+═══════════════════════════════════════════════════════════ */
+function renderChart(modelsData) {
+  if (shortChartInstance) { shortChartInstance.destroy(); shortChartInstance = null; }
+
+  const ref         = modelsData[0];
+  const lastDataDate = ref.meta.last_data_date;
+  const ldDate      = new Date(lastDataDate + "T12:00:00Z");
+  const seg2Start   = new Date(ldDate);
   seg2Start.setUTCDate(seg2Start.getUTCDate() - 29);
-  const seg2Dates = makeDateRange(seg2Start, 30);
+  const seg2Dates   = makeDateRange(seg2Start, 30);
+  const seg3Dates   = ref.fc.slice(0, 30).map(f => f.date);
+  const allDates    = [...seg2Dates, ...seg3Dates];
+  const allLabels   = allDates.map(fmtDate);
+  const seg2Set     = new Set(seg2Dates);
+  const LAST_IDX    = seg2Dates.length - 1;
 
-  // Forecast: first 30 days from forecast.json
-  const seg3Dates = fc.slice(0, 30).map(f => f.date);
+  const datasets = [];
 
-  /* ── Look-up maps ── */
-  const valMap  = Object.fromEntries(val.map(v => [v.date, v]));
-  const fcMap   = Object.fromEntries(fc.map(f => [f.date, f]));
-  const seg2Set = new Set(seg2Dates);
+  modelsData.forEach(({ cfg, val, fc }) => {
+    const mid = cfg.id;
+    const c   = MODEL_COLORS[mid];
+    const valMap = Object.fromEntries(val.map(v => [v.date, v]));
+    const fcMap  = Object.fromEntries(fc.map(f => [f.date, f]));
 
-  /* ── X-axis (60 days: 30 validation + 30 forecast) ── */
-  const allDates  = [...seg2Dates, ...seg3Dates];
-  const allLabels = allDates.map(fmtDate);
+    const valPred = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.predicted_point    ?? null) : null);
+    const valHi   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.upper_bound_point  ?? null) : null);
+    const valLo   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.lower_bound_point  ?? null) : null);
 
-  const LAST_DATA_IDX = seg2Dates.length - 1;  // = 29
+    const stitch  = valMap[allDates[LAST_IDX]]?.actual ?? null;
+    const fcPred  = allDates.map((d, i) => i === LAST_IDX ? stitch : (fcMap[d]?.predicted_point   ?? null));
+    const fcHi    = allDates.map((d, i) => i === LAST_IDX ? stitch : (fcMap[d]?.upper_bound_point ?? null));
+    const fcLo    = allDates.map((d, i) => i === LAST_IDX ? stitch : (fcMap[d]?.lower_bound_point ?? null));
 
-  /* ── Dataset arrays ── */
-  const actualData  = allDates.map(d => valMap[d]?.actual ?? null);
-  const valPredData = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.predicted_point   ?? null) : null);
-  const valHiData   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.upper_bound_point ?? null) : null);
-  const valLoData   = allDates.map(d => seg2Set.has(d) ? (valMap[d]?.lower_bound_point ?? null) : null);
+    const base = { borderColor: c.line, backgroundColor: "transparent", pointRadius: 0, tension: 0.35, spanGaps: false };
 
-  const stitchVal  = actualData[LAST_DATA_IDX];
-  const fcPredData = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.predicted_point   ?? null));
-  const fcHiData   = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.upper_bound_point ?? null));
-  const fcLoData   = allDates.map((d, i) => i === LAST_DATA_IDX ? stitchVal : (fcMap[d]?.lower_bound_point ?? null));
-
-  const provData = allDates.map(d => {
-    const e = valMap[d];
-    return (e?.provisional && e.actual != null) ? e.actual : null;
+    // Forecast band (upper fills to lower via +1)
+    datasets.push({ ...base, label: `${cfg.label} fc band hi`,  data: fcHi,  _modelId: mid, _type: "band-upper", borderColor: "transparent", backgroundColor: "transparent", fill: "+1" });
+    datasets.push({ ...base, label: `${cfg.label} fc band lo`,  data: fcLo,  _modelId: mid, _type: "band-lower", borderColor: "transparent", fill: false });
+    // Validation band
+    datasets.push({ ...base, label: `${cfg.label} val band hi`, data: valHi, _modelId: mid, _type: "band-upper", borderColor: "transparent", backgroundColor: "transparent", fill: "+1" });
+    datasets.push({ ...base, label: `${cfg.label} val band lo`, data: valLo, _modelId: mid, _type: "band-lower", borderColor: "transparent", fill: false });
+    // Lines
+    datasets.push({ ...base, label: `${cfg.label} validation`, data: valPred, _modelId: mid, _type: "val", borderDash: [5, 3], borderWidth: 1.75 });
+    datasets.push({ ...base, label: `${cfg.label}`,            data: fcPred,  _modelId: mid, _type: "fc",  borderWidth: 2 });
   });
 
-  /* ── Plugin: forecast region background shading ── */
-  const segmentBgPlugin = {
-    id: "segmentBg",
+  // Shared actual + provisional (from first model)
+  const refValMap = Object.fromEntries(ref.val.map(v => [v.date, v]));
+  datasets.push({ label: "Actual ISN", data: allDates.map(d => refValMap[d]?.actual ?? null), _type: "actual", borderColor: WHITE, backgroundColor: "transparent", borderWidth: 1.75, pointRadius: 0, tension: 0.35, spanGaps: false });
+  datasets.push({ label: "Provisional", data: allDates.map(d => { const e = refValMap[d]; return (e?.provisional && e.actual != null) ? e.actual : null; }), _type: "provisional", borderColor: "transparent", backgroundColor: "#f97316", pointRadius: 4.5, pointStyle: "circle", showLine: false, spanGaps: false });
+
+  const segBg = {
+    id: "segBg",
     beforeDraw(chart) {
       const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
-      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-      const px = idx => clamp(x.getPixelForValue(idx), left, right);
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
       ctx.save();
       ctx.fillStyle = "rgba(245,158,11,0.042)";
-      ctx.fillRect(px(LAST_DATA_IDX + 0.5), top, right - px(LAST_DATA_IDX + 0.5), bottom - top);
+      ctx.fillRect(clamp(x.getPixelForValue(LAST_IDX + 0.5), left, right), top, right - clamp(x.getPixelForValue(LAST_IDX + 0.5), left, right), bottom - top);
       ctx.restore();
     },
   };
-
-  /* ── Plugin: "Last known data" annotation line ── */
-  const vLinesPlugin = {
-    id: "vLines",
+  const vLine = {
+    id: "vLine",
     afterDraw(chart) {
       const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
-      const xp = x.getPixelForValue(LAST_DATA_IDX);
+      const xp = x.getPixelForValue(LAST_IDX);
       ctx.save();
-      ctx.strokeStyle = "rgba(226,232,242,0.40)";
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(xp, top);
-      ctx.lineTo(xp, bottom);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(226,232,242,0.40)";
-      ctx.font      = "500 9.5px Inter, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("Last known data", xp, top + 13);
-      ctx.restore();
-    },
-  };
-
-  /* ── Build chart ── */
-  chartInstance = new Chart(document.getElementById("chart-main"), {
-    type: "line",
-    data: {
-      labels: allLabels,
-      datasets: [
-        /* 0 — Forecast band upper → fills to 1 */
-        { label: "Forecast upper",       data: fcHiData,   borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.14)", pointRadius: 0, fill: "+1", tension: 0.35, spanGaps: false },
-        /* 1 — Forecast band lower */
-        { label: "Forecast lower",       data: fcLoData,   borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false, tension: 0.35, spanGaps: false },
-        /* 2 — Validation band upper → fills to 3 */
-        { label: "Validation band upper",data: valHiData,  borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.08)", pointRadius: 0, fill: "+1", tension: 0.35, spanGaps: false },
-        /* 3 — Validation band lower */
-        { label: "Validation band lower",data: valLoData,  borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false, tension: 0.35, spanGaps: false },
-        /* 4 — Actual ISN */
-        { label: "Actual ISN",           data: actualData, borderColor: WHITE,          backgroundColor: "transparent",            borderWidth: 1.75, pointRadius: 0, tension: 0.35, spanGaps: false },
-        /* 5 — Validation prediction (dashed amber) */
-        { label: "Validation prediction",data: valPredData,borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 1.75, borderDash: [5, 3], pointRadius: 0, tension: 0.35, spanGaps: false },
-        /* 6 — 30-day forecast (solid amber) */
-        { label: "30-Day Forecast",      data: fcPredData, borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 2.25, pointRadius: 0, tension: 0.35, spanGaps: false },
-        /* 7 — Provisional dots */
-        { label: "Provisional reading",  data: provData,   borderColor: "transparent", backgroundColor: "#f97316",                pointRadius: 4.5, pointStyle: "circle", showLine: false, spanGaps: false },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      interaction: { mode: "index", intersect: false },
-      layout: { padding: { top: 24, right: 4 } },
-      plugins: {
-        legend: { display: false },   // HTML legend used instead
-        tooltip: {
-          backgroundColor: "#111c2e",
-          borderColor: "#253650",
-          borderWidth: 1,
-          titleColor: WHITE,
-          bodyColor: "#7a90ae",
-          padding: 12,
-          boxPadding: 5,
-          titleFont: { family: "Inter", size: 12, weight: "600" },
-          bodyFont:  { family: "Inter", size: 12 },
-          filter: item => ![
-            "Forecast upper", "Forecast lower",
-            "Validation band upper", "Validation band lower",
-          ].includes(item.dataset.label),
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: TICK,
-            font: { family: "Inter", size: 11 },
-            maxRotation: 45,
-            autoSkip: true,
-            maxTicksLimit: 12,
-          },
-          grid: { color: GRID },
-          border: { color: GRID },
-        },
-        y: {
-          ticks: {
-            color: TICK,
-            font: { family: "Inter", size: 11 },
-          },
-          grid:   { color: GRID },
-          border: { color: GRID },
-          title: {
-            display: true,
-            text: "Daily Sunspot Number (ISN)",
-            color: TICK,
-            font: { family: "Inter", size: 11, weight: "500" },
-          },
-        },
-      },
-    },
-    plugins: [segmentBgPlugin, vLinesPlugin],
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LONG PANEL
-═══════════════════════════════════════════════════════════ */
-async function loadAndRenderLong() {
-  ["badge-lng-r2", "badge-lng-mae", "badge-lng-rmse"].forEach(id => {
-    document.getElementById(id).textContent = "…";
-  });
-  const cfg = MODEL_CONFIG[activeModelId] || MODEL_CONFIG["xgboost"];
-  try {
-    const [val, fc, metaFull] = await Promise.all([
-      loadJSON(cfg.paths.long_validation),
-      loadJSON(cfg.paths.long_forecast),
-      loadJSON(cfg.paths.metadata),
-    ]);
-    const meta = metaFull.long || {};
-    document.getElementById("badge-lng-r2").textContent   = fmt(meta.r2_point,   3);
-    document.getElementById("badge-lng-mae").textContent  = fmt(meta.mae_point,  2);
-    document.getElementById("badge-lng-rmse").textContent = fmt(meta.rmse_point, 2);
-    renderLongChart(val, fc);
-    populateLongDetails(meta);
-  } catch (err) {
-    console.error("Failed to load long data:", err);
-    ["badge-lng-r2", "badge-lng-mae", "badge-lng-rmse"].forEach(id => {
-      document.getElementById(id).textContent = "ERR";
-    });
-  }
-}
-
-function renderLongChart(val, fc) {
-  if (longChartInstance) { longChartInstance.destroy(); longChartInstance = null; }
-
-  const LAST_VAL_IDX = val.length - 1;
-  const fmtMo = iso => new Date(iso + "T12:00:00Z")
-    .toLocaleDateString("en-GB", { month: "short", year: "numeric" });
-  const allLabels = [...val.map(v => fmtMo(v.date)), ...fc.map(f => fmtMo(f.date))];
-  const N = allLabels.length;
-
-  const actualData  = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].actual ?? null) : null);
-  const valPredData = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].predicted_trend ?? null) : null);
-  const valHiData   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].upper_bound_trend ?? null) : null);
-  const valLoData   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (val[i].lower_bound_trend ?? null) : null);
-
-  const stitchVal  = val[LAST_VAL_IDX].actual ?? null;
-  const fcPredData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.predicted_trend   ?? null;
-    return null;
-  });
-  const fcHiData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.upper_bound_trend ?? null;
-    return null;
-  });
-  const fcLoData = Array.from({ length: N }, (_, i) => {
-    if (i === LAST_VAL_IDX) return stitchVal;
-    if (i > LAST_VAL_IDX)   return fc[i - val.length]?.lower_bound_trend ?? null;
-    return null;
-  });
-
-  const segPlugin = {
-    id: "segBgLng",
-    beforeDraw(chart) {
-      const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
-      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-      const px = idx => clamp(x.getPixelForValue(idx), left, right);
-      ctx.save();
-      ctx.fillStyle = "rgba(245,158,11,0.042)";
-      ctx.fillRect(px(LAST_VAL_IDX + 0.5), top, right - px(LAST_VAL_IDX + 0.5), bottom - top);
-      ctx.restore();
-    },
-  };
-  const vLinePlugin = {
-    id: "vLineLng",
-    afterDraw(chart) {
-      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
-      const xp = x.getPixelForValue(LAST_VAL_IDX);
-      ctx.save();
-      ctx.strokeStyle = "rgba(226,232,242,0.40)";
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = "rgba(226,232,242,0.40)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = "rgba(226,232,242,0.40)";
-      ctx.font = "500 9.5px Inter, sans-serif";
-      ctx.textAlign = "center";
+      ctx.font = "500 9.5px Inter, sans-serif"; ctx.textAlign = "center";
       ctx.fillText("Last known data", xp, top + 13);
       ctx.restore();
     },
   };
 
-  longChartInstance = new Chart(document.getElementById("chart-long"), {
+  shortChartInstance = new Chart(document.getElementById("chart-main"), {
     type: "line",
-    data: {
-      labels: allLabels,
-      datasets: [
-        { label: "Forecast band upper",   data: fcHiData,   borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.14)", pointRadius: 0, fill: "+1",   tension: 0.35, spanGaps: false },
-        { label: "Forecast band lower",   data: fcLoData,   borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false,  tension: 0.35, spanGaps: false },
-        { label: "Validation band upper", data: valHiData,  borderColor: "transparent", backgroundColor: "rgba(245,158,11,0.08)", pointRadius: 0, fill: "+1",   tension: 0.35, spanGaps: false },
-        { label: "Validation band lower", data: valLoData,  borderColor: "transparent", backgroundColor: "transparent",            pointRadius: 0, fill: false,  tension: 0.35, spanGaps: false },
-        { label: "Monthly ISN",           data: actualData, borderColor: WHITE,          backgroundColor: "transparent",            borderWidth: 1.5,  pointRadius: 0, tension: 0.35, spanGaps: false },
-        { label: "Validation prediction", data: valPredData,borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 1.75, borderDash: [5, 3], pointRadius: 0, tension: 0.35, spanGaps: false },
-        { label: "12-Year Forecast",      data: fcPredData, borderColor: AMBER,          backgroundColor: "transparent",            borderWidth: 2.25, pointRadius: 0, tension: 0.35, spanGaps: false },
-      ],
-    },
+    data: { labels: allLabels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       interaction: { mode: "index", intersect: false },
@@ -1243,7 +776,109 @@ function renderLongChart(val, fc) {
           titleColor: WHITE, bodyColor: "#7a90ae", padding: 12, boxPadding: 5,
           titleFont: { family: "Inter", size: 12, weight: "600" },
           bodyFont:  { family: "Inter", size: 12 },
-          filter: item => !["Forecast band upper","Forecast band lower","Validation band upper","Validation band lower"].includes(item.dataset.label),
+          filter: item => item.dataset._type === "fc" || item.dataset._type === "actual",
+          callbacks: { label: item => ` ${item.dataset.label}: ${item.parsed.y == null ? "—" : item.parsed.y.toFixed(1)}` },
+        },
+      },
+      scales: {
+        x: { ticks: { color: TICK, font: { family: "Inter", size: 11 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 }, grid: { color: GRID }, border: { color: GRID } },
+        y: { ticks: { color: TICK, font: { family: "Inter", size: 11 } }, grid: { color: GRID }, border: { color: GRID },
+             title: { display: true, text: "Daily Sunspot Number (ISN)", color: TICK, font: { family: "Inter", size: 11, weight: "500" } } },
+      },
+    },
+    plugins: [segBg, vLine],
+  });
+
+  attachHover(shortChartInstance);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LONG CHART
+═══════════════════════════════════════════════════════════ */
+function renderLongChart(modelsData) {
+  if (longChartInstance) { longChartInstance.destroy(); longChartInstance = null; }
+
+  const longModels = modelsData.filter(m => m.longVal && m.longFc);
+  if (!longModels.length) return;
+
+  const ref = longModels[0];
+  const LAST_VAL_IDX = ref.longVal.length - 1;
+  const fmtMo = iso => new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+  const allLabels = [...ref.longVal.map(v => fmtMo(v.date)), ...ref.longFc.map(f => fmtMo(f.date))];
+  const N = allLabels.length;
+
+  const datasets = [];
+
+  longModels.forEach(({ cfg, longVal, longFc }) => {
+    const mid = cfg.id;
+    const c   = MODEL_COLORS[mid];
+
+    const valPred = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (longVal[i].predicted_trend ?? null) : null);
+    const valHi   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (longVal[i].upper_bound_trend ?? null) : null);
+    const valLo   = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (longVal[i].lower_bound_trend ?? null) : null);
+
+    const stitch  = longVal[LAST_VAL_IDX].actual ?? null;
+    const fcPred  = Array.from({ length: N }, (_, i) => { if (i === LAST_VAL_IDX) return stitch; if (i > LAST_VAL_IDX) return longFc[i - longVal.length]?.predicted_trend ?? null; return null; });
+    const fcHi    = Array.from({ length: N }, (_, i) => { if (i === LAST_VAL_IDX) return stitch; if (i > LAST_VAL_IDX) return longFc[i - longVal.length]?.upper_bound_trend ?? null; return null; });
+    const fcLo    = Array.from({ length: N }, (_, i) => { if (i === LAST_VAL_IDX) return stitch; if (i > LAST_VAL_IDX) return longFc[i - longVal.length]?.lower_bound_trend ?? null; return null; });
+
+    const base = { borderColor: c.line, backgroundColor: "transparent", pointRadius: 0, tension: 0.35, spanGaps: false };
+
+    datasets.push({ ...base, label: `${cfg.label} fc band hi`,  data: fcHi,  _modelId: mid, _type: "band-upper", borderColor: "transparent", backgroundColor: "transparent", fill: "+1" });
+    datasets.push({ ...base, label: `${cfg.label} fc band lo`,  data: fcLo,  _modelId: mid, _type: "band-lower", borderColor: "transparent", fill: false });
+    datasets.push({ ...base, label: `${cfg.label} val band hi`, data: valHi, _modelId: mid, _type: "band-upper", borderColor: "transparent", backgroundColor: "transparent", fill: "+1" });
+    datasets.push({ ...base, label: `${cfg.label} val band lo`, data: valLo, _modelId: mid, _type: "band-lower", borderColor: "transparent", fill: false });
+    datasets.push({ ...base, label: `${cfg.label} validation`, data: valPred, _modelId: mid, _type: "val", borderDash: [5, 3], borderWidth: 1.75 });
+    datasets.push({ ...base, label: `${cfg.label}`,            data: fcPred,  _modelId: mid, _type: "fc",  borderWidth: 2 });
+  });
+
+  // Shared actual ISN
+  const actualData = Array.from({ length: N }, (_, i) => i <= LAST_VAL_IDX ? (ref.longVal[i].actual ?? null) : null);
+  datasets.push({ label: "Monthly ISN", data: actualData, _type: "actual", borderColor: WHITE, backgroundColor: "transparent", borderWidth: 1.5, pointRadius: 0, tension: 0.35, spanGaps: false });
+
+  const segBg = {
+    id: "segBgLng",
+    beforeDraw(chart) {
+      const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      ctx.save();
+      ctx.fillStyle = "rgba(245,158,11,0.042)";
+      ctx.fillRect(clamp(x.getPixelForValue(LAST_VAL_IDX + 0.5), left, right), top, right - clamp(x.getPixelForValue(LAST_VAL_IDX + 0.5), left, right), bottom - top);
+      ctx.restore();
+    },
+  };
+  const vLineLng = {
+    id: "vLineLng",
+    afterDraw(chart) {
+      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+      const xp = x.getPixelForValue(LAST_VAL_IDX);
+      ctx.save();
+      ctx.strokeStyle = "rgba(226,232,242,0.40)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(226,232,242,0.40)";
+      ctx.font = "500 9.5px Inter, sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("Last known data", xp, top + 13);
+      ctx.restore();
+    },
+  };
+
+  longChartInstance = new Chart(document.getElementById("chart-long"), {
+    type: "line",
+    data: { labels: allLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { top: 24, right: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#111c2e", borderColor: "#253650", borderWidth: 1,
+          titleColor: WHITE, bodyColor: "#7a90ae", padding: 12, boxPadding: 5,
+          titleFont: { family: "Inter", size: 12, weight: "600" },
+          bodyFont:  { family: "Inter", size: 12 },
+          filter: item => item.dataset._type === "fc" || item.dataset._type === "actual",
+          callbacks: { label: item => ` ${item.dataset.label}: ${item.parsed.y == null ? "—" : item.parsed.y.toFixed(1)}` },
         },
       },
       scales: {
@@ -1252,57 +887,30 @@ function renderLongChart(val, fc) {
              title: { display: true, text: "Monthly Sunspot Number (ISN)", color: TICK, font: { family: "Inter", size: 11, weight: "500" } } },
       },
     },
-    plugins: [segPlugin, vLinePlugin],
+    plugins: [segBg, vLineLng],
   });
+
+  attachHover(longChartInstance);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MODEL DESCRIPTION HELPERS
-═══════════════════════════════════════════════════════════ */
-function buildDetailRows(details) {
-  return details.map(d =>
-    `<div class="detail-row">
-       <span class="detail-key">${d.key}</span>
-       <span class="detail-val">${d.val}</span>
-     </div>`
-  ).join("");
-}
-
-function populateLongDetails(meta) {
-  const cfg      = meta.config || {};
-  const horizons = meta.horizons_trained || [];
-  const nSeeds   = meta.ensemble_size || 7;
-  const calW     = cfg.cal_window || 120;
-  const hRange   = horizons.length ? `+${horizons[0]} to +${horizons[horizons.length - 1]} months` : "";
-  const details  = [
-    { key: "Model",         val: "XGBoost Monthly Multi-Step Ensemble" },
-    { key: "Training data", val: `1818 to present · ${nSeeds}-seed ensemble · ${horizons.length} distinct horizons` },
-    { key: "Features",      val: "Monthly lags 1-132 months, rolling statistics up to 120 months, EMA, solar cycle + Gleissberg cycle encodings" },
-    { key: "Approach",      val: `Direct multi-step · ${nSeeds} seeds · ${hRange}` },
-    { key: "Uncertainty",   val: `Calibrated RMSE on trailing ${calW} months · 80% PI (1.28\u03c3)` },
-  ];
-  document.getElementById("model-detail-list-lng").innerHTML = buildDetailRows(details);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   INIT
+   MAIN
 ═══════════════════════════════════════════════════════════ */
 async function main() {
-  initDropdown();
-  document.getElementById("model-desc-text").textContent =
-    MODEL_CONFIG[activeModelId].description;
-  await Promise.all([
-    loadAndRender(activeModelId),
-    loadAndRenderLong(),
-  ]);
+  const modelsData = await loadAllModels();
+  if (!modelsData.length) { console.error("No models loaded"); return; }
+  buildAccordion(modelsData);
+  buildLegend(modelsData, "legend-short");
+  buildLegend(modelsData, "legend-long");
+  renderChart(modelsData);
+  renderLongChart(modelsData);
 }
 
 main().catch(err => {
   console.error(err);
   document.body.insertAdjacentHTML("beforeend",
     `<p style="color:#f87171;text-align:center;margin-top:3rem;font-family:Inter,sans-serif;font-size:0.85rem;">
-       Error loading data: ${err.message}<br>
-       <span style="color:#3d5170">Serve from solar_forecast/ with: python -m http.server 8080</span>
+       Error loading data: ${err.message}
      </p>`
   );
 });
