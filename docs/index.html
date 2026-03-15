@@ -751,9 +751,11 @@ const MODEL_CONFIG = {
       "Three models per horizon are trained with different random seeds and their predictions " +
       "averaged for robustness.",
     paths: {
-      validation: "outputs/validation.json",
-      forecast:   "outputs/forecast.json",
-      metadata:   "outputs/metadata.json",
+      validation:      "outputs/xgboost_validation.json",
+      forecast:        "outputs/xgboost_forecast.json",
+      metadata:        "outputs/xgboost_metadata.json",
+      long_validation: "outputs/xgboost_long_validation.json",
+      long_forecast:   "outputs/xgboost_long_forecast.json",
     },
     details: [
       { key: "Model",         val: "XGBoost Daily Multi-Step Ensemble" },
@@ -778,12 +780,14 @@ const MODEL_CONFIG = {
   lstm: {
     id:        "lstm",
     label:     "LSTM",
-    available: false,
+    available: true,
     description: "Long Short-Term Memory (LSTM) networks are recurrent neural networks designed to learn long-range temporal dependencies. For solar forecasting they capture multi-year solar cycle patterns alongside short-term variability without manual feature engineering.",
     paths: {
-      validation: "outputs/lstm/validation.json",
-      forecast:   "outputs/lstm/forecast.json",
-      metadata:   "outputs/lstm/metadata.json",
+      validation:      "outputs/lstm/validation.json",
+      forecast:        "outputs/lstm/forecast.json",
+      metadata:        "outputs/lstm/metadata.json",
+      long_validation: "outputs/lstm/long_validation.json",
+      long_forecast:   "outputs/lstm/long_forecast.json",
     },
     details: [],
   },
@@ -1131,11 +1135,12 @@ async function loadAndRenderLong() {
   ["badge-lng-r2", "badge-lng-mae", "badge-lng-rmse"].forEach(id => {
     document.getElementById(id).textContent = "…";
   });
+  const cfg = MODEL_CONFIG[activeModelId] || MODEL_CONFIG["xgboost"];
   try {
     const [val, fc, metaFull] = await Promise.all([
-      loadJSON("outputs/long_validation.json"),
-      loadJSON("outputs/long_forecast.json"),
-      loadJSON("outputs/metadata.json"),
+      loadJSON(cfg.paths.long_validation),
+      loadJSON(cfg.paths.long_forecast),
+      loadJSON(cfg.paths.metadata),
     ]);
     const meta = metaFull.long || {};
     document.getElementById("badge-lng-r2").textContent   = fmt(meta.r2_point,   3);
