@@ -1,0 +1,104 @@
+{
+  "date_generated": "2026-03-15T10:17:51.674294+00:00",
+  "data_start": "1819-01-08",
+  "data_end": "2026-02-28",
+  "last_data_date": "2026-02-28",
+  "model_name": "xgboost_multistep_v2",
+  "horizons_trained": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    10,
+    14,
+    18,
+    21,
+    25,
+    28,
+    30
+  ],
+  "ensemble_size": 3,
+  "forecast_horizon_days": 30,
+  "validation_window_days": 30,
+  "r2_point": -0.84419,
+  "r2_trend": -0.412929,
+  "mae_point": 57.3227,
+  "rmse_point": 64.8817,
+  "mae_trend": 48.2487,
+  "rmse_trend": 56.791,
+  "leakage_check": "direct multi-step -- each horizon model trained independently on validation parquet (boundary enforced by data_prepare.py), no autoregressive chaining",
+  "uncertainty_method": "calibrated RMSE on trailing CAL_WINDOW training rows, 80pct prediction interval (1.28 sigma)",
+  "note": "Forecast anchored to last available SILSO data date, not system date. SILSO daily data typically lags 3-7 days behind current date.",
+  "config": {
+    "ensemble_seeds": [
+      42,
+      7,
+      123
+    ],
+    "cal_window": 730,
+    "smooth_window": 25,
+    "weight_halflife": 90,
+    "xgb_params": {
+      "n_estimators": 600,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 5,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.5,
+      "gamma": 0.05
+    }
+  },
+  "long": {
+    "model_name": "xgboost_long_v2",
+    "data_granularity": "monthly",
+    "horizon_months": 144,
+    "validation_window_months": 144,
+    "horizons_trained": [
+      1,
+      6,
+      12,
+      24,
+      36,
+      48,
+      60,
+      72,
+      84,
+      96,
+      108,
+      120,
+      132,
+      144
+    ],
+    "ensemble_size": 3,
+    "r2_point": 0.448125,
+    "r2_trend": 0.279587,
+    "mae_point": 33.9033,
+    "rmse_point": 39.9052,
+    "mae_trend": 39.2701,
+    "rmse_trend": 45.5931,
+    "uncertainty_method": "calibrated RMSE, 80pct PI (1.28 sigma)",
+    "config": {
+      "ensemble_seeds": [
+        42,
+        7,
+        123
+      ],
+      "cal_window": 120,
+      "xgb_params": {
+        "n_estimators": 500,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 3,
+        "reg_alpha": 0.1,
+        "reg_lambda": 1.5
+      }
+    }
+  }
+}

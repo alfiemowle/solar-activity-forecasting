@@ -1,0 +1,272 @@
+[
+  {
+    "date": "2026-03-01",
+    "predicted_point": 64.74,
+    "predicted_trend": 99.83,
+    "lower_bound_point": 14.95,
+    "upper_bound_point": 114.53,
+    "lower_bound_trend": 77.49,
+    "upper_bound_trend": 122.16
+  },
+  {
+    "date": "2026-03-02",
+    "predicted_point": 64.09,
+    "predicted_trend": 100.96,
+    "lower_bound_point": 14.41,
+    "upper_bound_point": 113.78,
+    "lower_bound_trend": 77.72,
+    "upper_bound_trend": 124.21
+  },
+  {
+    "date": "2026-03-03",
+    "predicted_point": 65.88,
+    "predicted_trend": 100.51,
+    "lower_bound_point": 16.11,
+    "upper_bound_point": 115.65,
+    "lower_bound_trend": 77.43,
+    "upper_bound_trend": 123.58
+  },
+  {
+    "date": "2026-03-04",
+    "predicted_point": 67.97,
+    "predicted_trend": 100.19,
+    "lower_bound_point": 17.94,
+    "upper_bound_point": 118.0,
+    "lower_bound_trend": 77.16,
+    "upper_bound_trend": 123.21
+  },
+  {
+    "date": "2026-03-05",
+    "predicted_point": 56.48,
+    "predicted_trend": 100.05,
+    "lower_bound_point": 7.17,
+    "upper_bound_point": 105.8,
+    "lower_bound_trend": 77.04,
+    "upper_bound_trend": 123.06
+  },
+  {
+    "date": "2026-03-06",
+    "predicted_point": 55.18,
+    "predicted_trend": 99.8,
+    "lower_bound_point": 5.79,
+    "upper_bound_point": 104.56,
+    "lower_bound_trend": 76.87,
+    "upper_bound_trend": 122.72
+  },
+  {
+    "date": "2026-03-07",
+    "predicted_point": 53.41,
+    "predicted_trend": 99.47,
+    "lower_bound_point": 3.87,
+    "upper_bound_point": 102.95,
+    "lower_bound_trend": 76.5,
+    "upper_bound_trend": 122.44
+  },
+  {
+    "date": "2026-03-08",
+    "predicted_point": 54.24,
+    "predicted_trend": 99.56,
+    "lower_bound_point": 4.7,
+    "upper_bound_point": 103.78,
+    "lower_bound_trend": 76.36,
+    "upper_bound_trend": 122.76
+  },
+  {
+    "date": "2026-03-09",
+    "predicted_point": 55.07,
+    "predicted_trend": 99.66,
+    "lower_bound_point": 5.53,
+    "upper_bound_point": 104.61,
+    "lower_bound_trend": 76.22,
+    "upper_bound_trend": 123.09
+  },
+  {
+    "date": "2026-03-10",
+    "predicted_point": 55.9,
+    "predicted_trend": 99.75,
+    "lower_bound_point": 6.36,
+    "upper_bound_point": 105.44,
+    "lower_bound_trend": 76.08,
+    "upper_bound_trend": 123.42
+  },
+  {
+    "date": "2026-03-11",
+    "predicted_point": 52.81,
+    "predicted_trend": 99.52,
+    "lower_bound_point": 3.23,
+    "upper_bound_point": 102.38,
+    "lower_bound_trend": 75.85,
+    "upper_bound_trend": 123.19
+  },
+  {
+    "date": "2026-03-12",
+    "predicted_point": 49.71,
+    "predicted_trend": 99.29,
+    "lower_bound_point": 0.1,
+    "upper_bound_point": 99.31,
+    "lower_bound_trend": 75.61,
+    "upper_bound_trend": 122.96
+  },
+  {
+    "date": "2026-03-13",
+    "predicted_point": 46.61,
+    "predicted_trend": 99.05,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 96.25,
+    "lower_bound_trend": 75.38,
+    "upper_bound_trend": 122.73
+  },
+  {
+    "date": "2026-03-14",
+    "predicted_point": 43.51,
+    "predicted_trend": 98.82,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 93.18,
+    "lower_bound_trend": 75.15,
+    "upper_bound_trend": 122.5
+  },
+  {
+    "date": "2026-03-15",
+    "predicted_point": 43.48,
+    "predicted_trend": 98.87,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 92.96,
+    "lower_bound_trend": 75.0,
+    "upper_bound_trend": 122.73
+  },
+  {
+    "date": "2026-03-16",
+    "predicted_point": 43.45,
+    "predicted_trend": 98.91,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 92.74,
+    "lower_bound_trend": 74.85,
+    "upper_bound_trend": 122.97
+  },
+  {
+    "date": "2026-03-17",
+    "predicted_point": 43.42,
+    "predicted_trend": 98.95,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 92.51,
+    "lower_bound_trend": 74.71,
+    "upper_bound_trend": 123.2
+  },
+  {
+    "date": "2026-03-18",
+    "predicted_point": 43.39,
+    "predicted_trend": 99.0,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 92.29,
+    "lower_bound_trend": 74.56,
+    "upper_bound_trend": 123.43
+  },
+  {
+    "date": "2026-03-19",
+    "predicted_point": 41.94,
+    "predicted_trend": 98.8,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 91.01,
+    "lower_bound_trend": 74.33,
+    "upper_bound_trend": 123.27
+  },
+  {
+    "date": "2026-03-20",
+    "predicted_point": 40.5,
+    "predicted_trend": 98.61,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 89.74,
+    "lower_bound_trend": 74.11,
+    "upper_bound_trend": 123.11
+  },
+  {
+    "date": "2026-03-21",
+    "predicted_point": 39.06,
+    "predicted_trend": 98.41,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 88.46,
+    "lower_bound_trend": 73.88,
+    "upper_bound_trend": 122.94
+  },
+  {
+    "date": "2026-03-22",
+    "predicted_point": 39.94,
+    "predicted_trend": 98.44,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 89.55,
+    "lower_bound_trend": 73.68,
+    "upper_bound_trend": 123.2
+  },
+  {
+    "date": "2026-03-23",
+    "predicted_point": 40.82,
+    "predicted_trend": 98.47,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 90.65,
+    "lower_bound_trend": 73.49,
+    "upper_bound_trend": 123.46
+  },
+  {
+    "date": "2026-03-24",
+    "predicted_point": 41.7,
+    "predicted_trend": 98.51,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 91.75,
+    "lower_bound_trend": 73.3,
+    "upper_bound_trend": 123.72
+  },
+  {
+    "date": "2026-03-25",
+    "predicted_point": 42.58,
+    "predicted_trend": 98.54,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 92.85,
+    "lower_bound_trend": 73.1,
+    "upper_bound_trend": 123.97
+  },
+  {
+    "date": "2026-03-26",
+    "predicted_point": 42.93,
+    "predicted_trend": 98.35,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 93.27,
+    "lower_bound_trend": 72.9,
+    "upper_bound_trend": 123.79
+  },
+  {
+    "date": "2026-03-27",
+    "predicted_point": 43.28,
+    "predicted_trend": 98.15,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 93.7,
+    "lower_bound_trend": 72.7,
+    "upper_bound_trend": 123.61
+  },
+  {
+    "date": "2026-03-28",
+    "predicted_point": 43.63,
+    "predicted_trend": 97.96,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 94.12,
+    "lower_bound_trend": 72.5,
+    "upper_bound_trend": 123.43
+  },
+  {
+    "date": "2026-03-29",
+    "predicted_point": 46.94,
+    "predicted_trend": 98.35,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 97.46,
+    "lower_bound_trend": 72.51,
+    "upper_bound_trend": 124.19
+  },
+  {
+    "date": "2026-03-30",
+    "predicted_point": 50.24,
+    "predicted_trend": 98.74,
+    "lower_bound_point": 0.0,
+    "upper_bound_point": 100.8,
+    "lower_bound_trend": 72.52,
+    "upper_bound_trend": 124.95
+  }
+]
